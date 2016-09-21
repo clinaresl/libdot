@@ -1,0 +1,11 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
+
+Name: @PACKAGE_NAME@
+Description: Simple dot language parser implemented using regular expressions
+Version: @PACKAGE_VERSION@
+URL: @PACKAGE_URL@
+Libs: -L${libdir} -llibdot-@LIBDOT_API_VERSION@
+Cflags: -I${includedir}/libdot-@LIBDOT_API_VERSION@ -I${libdir}/libdot-@LIBDOT_API_VERSION@/include
