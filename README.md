@@ -14,12 +14,17 @@ Remarkably:
 
 1. It does not recognize HTML strings.
 2. Escape quotes (\") cannot be used to name IDs.
-3. The kewyord `strict` is not recognized yet
-4. Likewise, it is not possible to define subgraphs with the keyword `subgraph`.
+3. C comments (`/* ... */`) are not handled yet. Instead, only C++
+comments (`//`) are acknowledged.
+4. The kewyord `strict` is not recognized yet
+5. Likewise, it is not possible to define subgraphs with the keyword `subgraph`.
 
 Note that both edges and nodes can be given an `attr_list` which
 consists of a comma separated list of assignments given between square
 brackets.
+
+It also includes the code to create an executable (called `parser`)
+which effectively parses the contents of any dot file.
 
 
 # Install #
@@ -53,9 +58,122 @@ execute:
 
     $ make uninstall
 
-Finally, be aware that it might be necessary to prepend both `make
+Be aware that it might be necessary to prepend both `make
 install` and `make uninstall` with `sudo` in case you are installing
 in su-protected directories such as `/usr/local`
+
+To compile the `parser`, go to the directory `parser/` and use the
+following command:
+
+    $ ./configure; make
+
+The same instructions given above for customizing the configuration of
+the library can be used here to customize the creation of the
+makefile. To remove ancillary files use the command:
+
+    $ make distclean
+
+
+# Examples #
+
+The directory `parser/examples` contains various dot files that
+represent simple graphs. Some come with no attributes, while others
+use attributes to qualify nodes and edges.
+
+To parse a dot file (e.g., `parser/examples/graph1.dot`) go to the
+directory `parser/` and compile it following the instructions given
+above. Then execute:
+
+    $ ./parser --file examples/graph1.dot
+
+     Type: graph
+     Name: prueba
+
+As shown above, the parser will respond with the type of graph
+(`graph` which is an undirected graph) and its name, which is
+optional, *prueba*. It is also possible to see how the parser
+processes separately each block:
+
+    $ ./parser --file examples/graph1.dot --verbose
+
+     [TYPE <graph>]
+     [NAME <prueba>]
+     [--- Block begin found ---]
+     [VERTEX NAME <s>]
+     [EDGE TYPE <-->]
+     [ --- Beginning multiple target specification ---]
+     [TARGET NAME <A>]
+     [TARGET NAME <B>]
+     [TARGET NAME <C>]
+     [ --- Ending multiple target specification ---]
+     [VERTEX NAME <A>]
+     [EDGE TYPE <-->]
+     [ --- Beginning multiple target specification ---]
+     [TARGET NAME <B>]
+     [TARGET NAME <t>]
+     [ --- Ending multiple target specification ---]
+     [VERTEX NAME <B>]
+     [EDGE TYPE <-->]
+     [TARGET NAME <t>]
+     [VERTEX NAME <C>]
+     [EDGE TYPE <-->]
+     [ --- Beginning multiple target specification ---]
+     [TARGET NAME <B>]
+     [TARGET NAME <t>]
+     [ --- Ending multiple target specification ---]
+     [ --- Block end found ---]
+
+     Type: graph
+     Name: prueba
+    
+The parser precedes then the name and type of the graph with
+information of each block as it was processed on the fly.
+
+In case a graph contains attributes for nodes and/or edges, then use
+`--show-attributes` to inspect them (in this case
+`examples/graph2.dot` is used instead as the first graph contains no
+attributes):
+
+    $ ./parser --file examples/graph2.dot --show-attributes
+
+     Type: graph
+     Name: prueba
+    
+     Vertex A:
+    	 h_cff: 10.10
+
+     Vertex B:
+	 h_cff: 1
+	 h_pdb: 1.41
+	 name: "(0,0)"
+
+     Vertex C:
+	 h_cff: 3.14159
+	 h_ff: 1.0
+	 h_pdb: 10.0
+
+     Edge A -> s:
+	 k: 1
+
+     Edge A -> B:
+	 k: 1
+
+     Edge B -> t:
+	 k: 1
+	 name: "Optimal"
+
+     Edge B -> C:
+	 k: 1
+
+     Edge t -> C:
+	 k: 1
+
+The output has been shorten to make it easy to read.
+
+Finally, `parser` acknowledges two additional directives:
+
+* `--help` provides additional information on the available commands
+* `--version` provides the version of the implementation.
 
 
 # License #
