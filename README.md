@@ -17,7 +17,14 @@ Remarkably:
 3. C comments (`/* ... */`) are not handled yet. Instead, only C++
 comments (`//`) are acknowledged.
 4. The kewyord `strict` is not recognized yet
-5. Likewise, it is not possible to define subgraphs with the keyword `subgraph`.
+5. Likewise, it is not possible to define subgraphs with the keyword
+`subgraph`.
+
+6. According to the official definitions of dot: *Edges can be
+specified as `->` in directed graphs and `--` in undirected
+graphs*. However, this parser acknowledges its usage in both cases
+with the obvious syntax. This actually makes that the graph type is
+not relevant at all.
 
 Note that both edges and nodes can be given an `attr_list` which
 consists of a comma separated list of assignments given between square

@@ -12,7 +12,7 @@ digraph prueba {
       //     s---C
       //
       // Since it is a digraph, adjacencies are specified from one
-      // vertex to another
+      // vertex to another with -> and in both directions with --
       
       s [h_cff=2.0, h_pdb=2, name="Start"] -- [k=1] {
       	A
