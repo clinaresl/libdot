@@ -36,58 +36,41 @@ namespace dot {
 
   class parser {
 
-  public:
+  private:
 
-    // Default constructor
-    parser ()
-      : _filename {""}
-    { }
-    
-    // Explicit constructor
-    parser (string filename)
-      : _filename {filename}
-    { }
+    // INVARIANTS: every dot parser consists of a filename which is stored in a
+    // private data member. The parser is responsible to process the contents of
+    // this file sequentially discanding those parts that are successfully
+    // processed
+    string _filename;           // filename with the dot specification to parse
 
-    // get/set accessors
-    string get_type () const
-    { return _type; }
-    string get_name () const
-    { return _name; }
+    // INVARIANTS: each graph has a type (either directed or undirected) and a
+    // name (which can be the empty string). They are stored in dedicated data
+    // members
+    string _type;                  // graph type, either directed or undirected
+    string _name;              // graph name which can be also the empty string
 
-    // show a void line
-    void show_void (const string& line, bool verbose);
+    // graphs are represented like adjacency maps which are indexed by the
+    // vertex name given in the dot file. Each entry of the map consists then of
+    // a vector of adjacent vertices
+    map<string, vector<string>> _graph;
     
-    // get all vertices of the graph
-    vector<string> get_vertices () const;
-    
-    // get all nodes that are reachable from a given node
-    vector<string> get_neighbours (const string name);
-    
-    // get all the attributes of the specified vertex
-    vector<string> get_vertex_attributes (const string name);
-  
-    // return the value of an attribute defined for a specific vertex
-    string get_vertex_attribute (string name, string attrname);
+    // each graph is made of vertices and edges which can be characterized with
+    // attributes. These are stored in a couple of maps:
+    //
+    //    _vertex stores for every vertex name a map of attributes of the form
+    //    "name"->"value"
+    //    _edge stores for every vertex name a map which is indexed with the
+    //    target vertex name and a map of attribute names and values.
+    //
+    // In both cases, though values can be casted into different types, they are
+    // internally stored as strings.
+    map<string,map<string,string>> _vertex;
+    map<string,map<string,map<string, string>>> _edge;
 
-    // get all the attributes of a specific edge qualified by its
-    // (origin,target) names
-    vector<string> get_edge_attributes (const string origin, const string target);
-
-    // return the value of the given attribute defined for the vertex qualified
-    // by (origin,target) names
-    string get_edge_attribute (const string origin, const string target, const string attr);
-
-    // set the filename to parse
-    void set_filename (string filename)
-    { _filename = filename; }
-    
-    // Sets the verbose level to true by default
-    void set_verbose (bool value = true)
-    { _verbose = value; }
-    
-    // parse the file given in the construction of this instance. It returns
-    // true if the file could be successfully parse and false otherwise.
-    bool parse ();    
+    // Additionally, the user can explicitly request verbose output while
+    // parsing the dot specification file. It is disabled by default
+    bool _verbose;                     // whether the user wants verbose output
     
   private:
 
@@ -145,38 +128,58 @@ namespace dot {
     // attributes were found and false otherwise.
     bool _parse_attributes (string& contents, map<string, string>& dict);
     
-  private:
+  public:
 
-    // INVARIANTS: every dot parser consists of a filename which is stored in a
-    // private data member. The parser is responsible to process the contents of
-    // this file sequentially discanding those parts that are successfully
-    // processed
-    string _filename;           // filename with the dot specification to parse
-
-    // INVARIANTS: each graph has a type (either directed or undirected) and a
-    // name (which can be the empty string). They are stored in dedicated data
-    // members
-    string _type;                  // graph type, either directed or undirected
-    string _name;              // graph name which can be also the empty string
-
-    // INVARIANTS: graphs are represented like adjacency maps which are indexed
-    // by the vertex name given in the dot file. Each entry of the map consists
-    // then of a vector of adjacent vertices
-    map<string, vector<string>> _graph;
+    // Default constructor
+    parser ()
+      : _filename {""}
+    { }
     
-    // INVARIANTS: each graph is made of vertices and edges which can be
-    // characterized with attributes. These are stored in a couple of
-    // maps. _vertex stores for every vertex name a map of attributes of the
-    // form "name"->"value". _edge stores for every vertex name a map which is
-    // indexed with the target vertex name and a map of attribute names and
-    // values. In both cases, though values can be casted into different types,
-    // they are internally stored as strings.
-    map<string,map<string,string>> _vertex;
-    map<string,map<string,map<string, string>>> _edge;
+    // Explicit constructor
+    parser (string filename)
+      : _filename {filename}
+    { }
 
-    // Additionally, the user can explicitly request verbose output while
-    // parsing the dot specification file. It is disabled by default
-    bool _verbose;                     // whether the user wants verbose output
+    // get/set accessors
+    string get_type () const
+    { return _type; }
+    string get_name () const
+    { return _name; }
+
+    // show a void line
+    void show_void (const string& line, bool verbose);
+    
+    // get all vertices of the graph
+    vector<string> get_vertices () const;
+    
+    // get all nodes that are reachable from a given node
+    vector<string> get_neighbours (const string name);
+    
+    // get all the attributes of the specified vertex
+    vector<string> get_vertex_attributes (const string name);
+  
+    // return the value of an attribute defined for a specific vertex
+    string get_vertex_attribute (string name, string attrname);
+
+    // get all the attributes of a specific edge qualified by its
+    // (origin,target) names
+    vector<string> get_edge_attributes (const string origin, const string target);
+
+    // return the value of the given attribute defined for the vertex qualified
+    // by (origin,target) names
+    string get_edge_attribute (const string origin, const string target, const string attr);
+
+    // set the filename to parse
+    void set_filename (string filename)
+    { _filename = filename; }
+    
+    // Sets the verbose level to true by default
+    void set_verbose (bool value = true)
+    { _verbose = value; }
+    
+    // parse the file given in the construction of this instance. It returns
+    // true if the file could be successfully parse and false otherwise.
+    bool parse ();    
     
   };  // class parser
   

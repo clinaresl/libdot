@@ -18,229 +18,8 @@
 
 #include "DOTparser.h"
 
-// show a void line
-void dot::parser::show_void (const string& line, bool verbose)
-{
-  if (verbose)
-    cout << " [" << line << "]" << endl;
-}
-  
-
-// get all vertices of the graph
-std::vector<std::string> dot::parser::get_vertices () const
-{
-  vector<string> vertices;
-
-  // now, go over the adjacency map retrieving the names of all vertices
-  if (_graph.size ())
-    for (auto ivertex=_graph.begin () ; ivertex!=_graph.end () ; ++ivertex)
-      vertices.push_back (ivertex->first);
-
-  return vertices;
-}
-
-// get all nodes that are reachable from a given node
-std::vector<std::string> dot::parser::get_neighbours (const string name)
-{
-  return _graph[name];
-}
-
-// get all the attributes of the specified vertex
-std::vector<std::string> dot::parser::get_vertex_attributes (const string name)
-{
-  vector<string> attrs;
-
-  // now, go over the attributes of this specific vertex, in case any has been
-  // defined
-  map<string,map<string,string>>::iterator iattrs = _vertex.find (name);
-  if (iattrs != _vertex.end ()) {
-
-    // and retrieve the attribute names defined for it
-    for (auto iattr=iattrs->second.begin () ; iattr!=iattrs->second.end () ; ++iattr)
-      attrs.push_back (iattr->first);
-  }
-  return attrs;
-}
-
-// return the value of an attribute defined for a specific vertex
-std::string dot::parser::get_vertex_attribute (string name, string attrname)
-{
-  return _vertex[name][attrname];
-}
-
-// get all the attributes of a specific edge qualified by its (origin,target)
-// names
-std::vector<std::string> dot::parser::get_edge_attributes (const string origin,
-							   const string target)
-{
-  vector<string> attrs;
-
-  // now, verify that the pair (origin,target) exist in the map of edge
-  // attributes
-  typename map<string,map<string,map<string,string>>>::iterator iattrs = _edge.find (origin);
-  if (iattrs!=_edge.end ()) {
-    typename map<string,map<string,string>>::iterator jattrs = iattrs->second.find (target);
-    if (jattrs != iattrs->second.end ()) {
-
-      // now, return all the attributes in this map
-      for (auto kattr=jattrs->second.begin () ; kattr != jattrs->second.end () ; ++kattr)
-	attrs.push_back (kattr->first);
-    }
-  }
-
-  return attrs;
-}
-
-// return the value of the given attribute defined for the vertex qualified
-// by (origin,target) names
-std::string dot::parser::get_edge_attribute (const string origin,
-					     const string target,
-					     const string attr)
-{
-  return _edge[origin][target][attr];
-}
-
-// parse the file given in the construction of this instance. It returns true if
-// the file could be successfully parse and false otherwise.
-bool dot::parser::parse ()
-{
-  bool eob = false;                                             // end of block
-  
-  // -- read the file
-  string contents;
-  if (!_read_file (contents))
-    return false;
-
-  // -- parse the file
-
-  // get the graph type and its ID (which is optional)
-  // REMARK - "strict" is not acknowledged!
-  if (!_parse_graph_type (contents, _type))
-    return false;
-  
-  // get the graph name
-  // REMARK - the graph name is entirely optional
-  if (!_parse_graph_name (contents, _name))
-    return false;
-  
-  // block start
-  if (!_parse_block_begin (contents))
-    return false;
-  
-  // now, process all edges of the graph
-  while (!eob) {
-
-    // unless we are closing the block at this point
-    _parse_comments (contents);
-    if (!(eob=_parse_void (contents, BLOCK_END))) {
-
-      // get the next vertex name
-      string orig_name;
-      if (!_parse_vertex_name (contents, orig_name))
-	return false;
-
-      // and process also its attributes
-      map<string, string> origdict;
-      if (_parse_attributes (contents, origdict))
-	_vertex [orig_name] = origdict;
-
-      // now, get the edge type, either directed or undirected
-      string edge_type;
-      if (!_parse_edge_type (contents, edge_type))
-	return false;
-
-      // and process its attributes
-      map<string, string> arcdict;
-      _parse_attributes (contents, arcdict);
-
-      // the target can be specified in two different forms: either single or
-      // multiple. A single target consists uniquely of a single vertex
-      string target_name;
-      if (!_parse_target_name (contents, target_name, orig_name, edge_type)) {
-	
-	// if a single target was not recognized, then multiple targets are
-	// tried. They consist of an arbitrarily large list of vertices between
-	// curly brackets
-	if (_parse_void (contents, BLOCK_BEGIN)) {
-	  show_void (" --- Beginning multiple target specification ---", _verbose);
-	  bool eomts = false;           // end of multiple target specification
-	  while (!eomts) {
-
-	    // unless the multiple target specification is over
-	    _parse_comments (contents);
-	    if (!(eomts=_parse_void (contents, BLOCK_END))) {
-
-	      // get the next vertex name
-	      if (!_parse_target_name (contents, target_name, orig_name, edge_type)) {
-		cerr << " Syntax error: TARGET_NAME could not be parsed" << endl;
-		if (!_verbose)
-		  cerr << " try --verbose to obtain additional information" << endl;
-		return false;
-	      }
-	      else {
-
-		// first, process the edge attributes: if and only if any edge
-		// attributes were given
-		if (arcdict.size ()) {
-
-		  // Syntax: [orig][target][attr name] = attr value
-		  _edge[orig_name][target_name] = arcdict;
-
-		  // also, in case this is an edge of the form "--" then
-		  // annotate the same attribute to the reversed direction
-		  if (edge_type == "--")
-		    _edge[target_name][orig_name] = arcdict;
-		}
-		
-		// and process also this vertex attributes, if given
-		map<string, string> targetdict;
-		if (_parse_attributes (contents, targetdict))
-		  _vertex [target_name] = targetdict;
-	      }
-	    }
-	  }
-	  show_void (" --- Ending multiple target specification ---", _verbose);
-	}
-	else {
-	  cerr << " Syntax error: TARGET_NAME could not be parsed" << endl;
-	  if (!_verbose)
-	    cerr << " try --verbose to obtain additional information" << endl;
-	  return false;
-	}
-      }
-
-      // if the target was given in single form, then process the attributes of
-      // the edge from its origin, if given
-      else 
-	
-	// if and only if any edge attributes were given
-	if (arcdict.size ()) {
-
-	  // Syntax: [orig][target][attr name] = attr value
-	  _edge[orig_name][target_name] = arcdict;
-
-	  // also, in case this is an edge of the form "--" then
-	  // annotate the same attribute to the reversed direction
-	  if (edge_type == "--")
-	    _edge[target_name][orig_name] = arcdict;
-	}
-
-      // process now the attributes of the target vertex, if given
-      map<string, string> targetdict;
-      if (_parse_attributes (contents, targetdict))
-	_vertex [target_name] = targetdict;
-      
-      // this completes the processing of a single statement, consume the
-      // semicolon in case it has been given
-      _parse_comments (contents);
-      _parse_void (contents, END_OF_STATEMENT);
-    }
-  }
-
-  show_void (" --- Block end found ---", _verbose);
-  
-  return true;                                                 // nicely return
-}
+// Private services
+// ----------------------------------------------------------------------------
 
 // return in contents all the contents of the file in _filename where newlines
 // have been removed
@@ -481,6 +260,234 @@ bool dot::parser::_parse_attributes (string& contents, map<string, string>& dict
   // at this point, no attribute section was processed
   return false;
 }
+
+// Public services
+// ----------------------------------------------------------------------------
+
+// show a void line
+void dot::parser::show_void (const string& line, bool verbose)
+{
+  if (verbose)
+    cout << " [" << line << "]" << endl;
+}
+  
+
+// get all vertices of the graph
+std::vector<std::string> dot::parser::get_vertices () const
+{
+  vector<string> vertices;
+
+  // now, go over the adjacency map retrieving the names of all vertices
+  if (_graph.size ())
+    for (auto ivertex=_graph.begin () ; ivertex!=_graph.end () ; ++ivertex)
+      vertices.push_back (ivertex->first);
+
+  return vertices;
+}
+
+// get all nodes that are reachable from a given node
+std::vector<std::string> dot::parser::get_neighbours (const string name)
+{
+  return _graph[name];
+}
+
+// get all the attributes of the specified vertex
+std::vector<std::string> dot::parser::get_vertex_attributes (const string name)
+{
+  vector<string> attrs;
+
+  // now, go over the attributes of this specific vertex, in case any has been
+  // defined
+  map<string,map<string,string>>::iterator iattrs = _vertex.find (name);
+  if (iattrs != _vertex.end ()) {
+
+    // and retrieve the attribute names defined for it
+    for (auto iattr=iattrs->second.begin () ; iattr!=iattrs->second.end () ; ++iattr)
+      attrs.push_back (iattr->first);
+  }
+  return attrs;
+}
+
+// return the value of an attribute defined for a specific vertex
+std::string dot::parser::get_vertex_attribute (string name, string attrname)
+{
+  return _vertex[name][attrname];
+}
+
+// get all the attributes of a specific edge qualified by its (origin,target)
+// names
+std::vector<std::string> dot::parser::get_edge_attributes (const string origin,
+							   const string target)
+{
+  vector<string> attrs;
+
+  // now, verify that the pair (origin,target) exist in the map of edge
+  // attributes
+  typename map<string,map<string,map<string,string>>>::iterator iattrs = _edge.find (origin);
+  if (iattrs!=_edge.end ()) {
+    typename map<string,map<string,string>>::iterator jattrs = iattrs->second.find (target);
+    if (jattrs != iattrs->second.end ()) {
+
+      // now, return all the attributes in this map
+      for (auto kattr=jattrs->second.begin () ; kattr != jattrs->second.end () ; ++kattr)
+	attrs.push_back (kattr->first);
+    }
+  }
+
+  return attrs;
+}
+
+// return the value of the given attribute defined for the vertex qualified
+// by (origin,target) names
+std::string dot::parser::get_edge_attribute (const string origin,
+					     const string target,
+					     const string attr)
+{
+  return _edge[origin][target][attr];
+}
+
+// parse the file given in the construction of this instance. It returns true if
+// the file could be successfully parse and false otherwise.
+bool dot::parser::parse ()
+{
+  bool eob = false;                                             // end of block
+  
+  // -- read the file
+  string contents;
+  if (!_read_file (contents))
+    return false;
+
+  // -- parse the file
+
+  // get the graph type and its ID (which is optional)
+  // REMARK - "strict" is not acknowledged!
+  if (!_parse_graph_type (contents, _type))
+    return false;
+  
+  // get the graph name
+  // REMARK - the graph name is entirely optional
+  if (!_parse_graph_name (contents, _name))
+    return false;
+  
+  // block start
+  if (!_parse_block_begin (contents))
+    return false;
+  
+  // now, process all edges of the graph
+  while (!eob) {
+
+    // unless we are closing the block at this point
+    _parse_comments (contents);
+    if (!(eob=_parse_void (contents, BLOCK_END))) {
+
+      // get the next vertex name
+      string orig_name;
+      if (!_parse_vertex_name (contents, orig_name))
+	return false;
+
+      // and process also its attributes
+      map<string, string> origdict;
+      if (_parse_attributes (contents, origdict))
+	_vertex [orig_name] = origdict;
+
+      // now, get the edge type, either directed or undirected
+      string edge_type;
+      if (!_parse_edge_type (contents, edge_type))
+	return false;
+
+      // and process its attributes
+      map<string, string> arcdict;
+      _parse_attributes (contents, arcdict);
+
+      // the target can be specified in two different forms: either single or
+      // multiple. A single target consists uniquely of a single vertex
+      string target_name;
+      if (!_parse_target_name (contents, target_name, orig_name, edge_type)) {
+	
+	// if a single target was not recognized, then multiple targets are
+	// tried. They consist of an arbitrarily large list of vertices between
+	// curly brackets
+	if (_parse_void (contents, BLOCK_BEGIN)) {
+	  show_void (" --- Beginning multiple target specification ---", _verbose);
+	  bool eomts = false;           // end of multiple target specification
+	  while (!eomts) {
+
+	    // unless the multiple target specification is over
+	    _parse_comments (contents);
+	    if (!(eomts=_parse_void (contents, BLOCK_END))) {
+
+	      // get the next vertex name
+	      if (!_parse_target_name (contents, target_name, orig_name, edge_type)) {
+		cerr << " Syntax error: TARGET_NAME could not be parsed" << endl;
+		if (!_verbose)
+		  cerr << " try --verbose to obtain additional information" << endl;
+		return false;
+	      }
+	      else {
+
+		// first, process the edge attributes: if and only if any edge
+		// attributes were given
+		if (arcdict.size ()) {
+
+		  // Syntax: [orig][target][attr name] = attr value
+		  _edge[orig_name][target_name] = arcdict;
+
+		  // also, in case this is an edge of the form "--" then
+		  // annotate the same attribute to the reversed direction
+		  if (edge_type == "--")
+		    _edge[target_name][orig_name] = arcdict;
+		}
+		
+		// and process also this vertex attributes, if given
+		map<string, string> targetdict;
+		if (_parse_attributes (contents, targetdict))
+		  _vertex [target_name] = targetdict;
+	      }
+	    }
+	  }
+	  show_void (" --- Ending multiple target specification ---", _verbose);
+	}
+	else {
+	  cerr << " Syntax error: TARGET_NAME could not be parsed" << endl;
+	  if (!_verbose)
+	    cerr << " try --verbose to obtain additional information" << endl;
+	  return false;
+	}
+      }
+
+      // if the target was given in single form, then process the attributes of
+      // the edge from its origin, if given
+      else 
+	
+	// if and only if any edge attributes were given
+	if (arcdict.size ()) {
+
+	  // Syntax: [orig][target][attr name] = attr value
+	  _edge[orig_name][target_name] = arcdict;
+
+	  // also, in case this is an edge of the form "--" then
+	  // annotate the same attribute to the reversed direction
+	  if (edge_type == "--")
+	    _edge[target_name][orig_name] = arcdict;
+	}
+
+      // process now the attributes of the target vertex, if given
+      map<string, string> targetdict;
+      if (_parse_attributes (contents, targetdict))
+	_vertex [target_name] = targetdict;
+      
+      // this completes the processing of a single statement, consume the
+      // semicolon in case it has been given
+      _parse_comments (contents);
+      _parse_void (contents, END_OF_STATEMENT);
+    }
+  }
+
+  show_void (" --- Block end found ---", _verbose);
+  
+  return true;                                                 // nicely return
+}
+
 
 
 /* Local Variables: */
