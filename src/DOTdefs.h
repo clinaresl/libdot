@@ -28,8 +28,8 @@
 #include <string>
 
 // Specification part
-#define GRAPH_TYPE "^[[:space:]]*([[:alnum:]]+)"
-#define GRAPH_NAME "^[[:space:]]*([[:alnum:]]*)"
+#define GRAPH_TYPE R"(^[[:space:]]*([[:alnum:]]+))"
+#define GRAPH_NAME R"(^[[:space:]]*([\-0-9a-zA-Z_]*))"
 #define BLOCK_BEGIN "^[[:space:]]*\\{"
 #define BLOCK_END "^[[:space:]]*}"
 #define VERTEX_NAME "^[[:space:]]*([[:alnum:]]+)"
@@ -41,7 +41,6 @@
 #define ATTRIBUTE_BEGIN "^[[:space:]]*\\["
 #define ATTRIBUTE_NAME "^[[:space:]]*(([[:alnum:]]|_)+)[[:space:]]*="
 #define ATTRIBUTE_VALUE_NEXT "^[[:space:]]*((([+-]?(\\.[[:digit:]]|[[:digit:]]+(\\.[[:digit:]]*)?))|([[:alnum:]])|(_|\".*\")+))[[:space:]]*,"
-// #define ATTRIBUTE_VALUE_END "^[[:space:]]*((([+-]?(\\.[[:digit:]]|[[:digit:]]+(\\.[[:digit:]]*)?))|([[:alnum:]])|(_|\".*\")+))[[:space:]]*\\]"
 #define ATTRIBUTE_VALUE_END "^[[:space:]]*((([+-]?(\\.[[:digit:]]|[[:digit:]]+(\\.[[:digit:]]*)?))|([[:alnum:]])|(_|\"[^\"]*\")+))[[:space:]]*\\]"
 #define ATTRIBUTE_END "^[[:space:]]*\\]"
 

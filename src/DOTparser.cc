@@ -21,38 +21,39 @@
 // Private services
 // ----------------------------------------------------------------------------
 
-// return in contents all the contents of the file in _filename where newlines
-// have been removed
-bool dot::parser::_read_file (string& contents)
+// return in contents all the contents of the dot file stored in _file. It
+// returns true if the operation was successfully performed. Otherwise, it
+// raises an exception
+//
+// the following is deemed as the fastes C++ way for reading the entire contents
+// of a file into a single string. Others might prefer buffer iterators but that
+// is surprisingly slow.
+//
+// See: http://insanecoding.blogspot.com/2011/11/how-to-read-in-file-in-c.html
+bool dot::parser::_read_file(string& contents) const
 {
-  streampos size;
-  char* memblock;
-
-  // create the file and note that we intentionally locate at the end
-  // (ios::ate). This is done to derive the size of the file
-  ifstream file (_filename, ios::in|ios::ate);
-  if (file.is_open())
-  {
-    size = file.tellg();                        // get the current get position
-    memblock = new char [size];
-    file.seekg (0, ios::beg);            // locate at the beginning of the file
-    file.read (memblock, size);          // read the whole contents of the file
-    contents = memblock;
-    file.close();                                             // close the file
-    delete[] memblock;                                       // and free memory
-  }
-  else {
-    cerr << " Fatal error: it was not possible to read file '" << _filename << "'" << endl << endl;
-    return false;
+  std::ifstream in(_filename, std::ios::in);
+  if (in) {
+    
+    in.seekg (0, std::ios::end);
+    contents.resize (in.tellg ());
+    in.seekg (0, std::ios::beg);
+    in.read (&contents[0], contents.size ());
+    in.close ();
+    return true;
   }
 
-  return true;
+  // if it was not possible to open the input stream, then throw an error
+  throw invalid_argument (" It was not possible to read the contents of the dot file: " + _filename);
 }
 
 // the following methods parse different types according to the given
 // regexp. The second and third methods return in value the matching of the
 // given regexp.
-bool dot::parser::_parse_void (string& content, const string& regexp)
+
+// just simply parse a regular expression. It return true if the given string
+// was parsed and false otherwise.
+bool dot::parser::_parse_void (string& content, const string& regexp) const
 {
   smatch matches;
   regex pattern {regexp};                                   // create the regex
@@ -63,7 +64,10 @@ bool dot::parser::_parse_void (string& content, const string& regexp)
   return false;                                  // otherwise exit with failure
 }
 
-bool dot::parser::_parse_string (string& content, const string& regexp, string& value)
+// parse a string and return its value in 'value' It return true if the given
+// string was parsed and false otherwise.
+bool dot::parser::_parse_string (string& content, const string& regexp,
+				 string& value) const
 {
   smatch matches;
   regex pattern {regexp};                                   // create the regex
@@ -75,8 +79,10 @@ bool dot::parser::_parse_string (string& content, const string& regexp, string& 
   return false;                                  // otherwise exit with failure
 }
 
+// parse an unsigned int and return its value in 'value' It return true if the
+// given string was parsed and false otherwise.
 bool dot::parser::_parse_unsigned_int (string& content, const string& regexp, 
-				       unsigned int& value)
+				       unsigned int& value) const
 {
   smatch matches;
   regex pattern {regexp};                                   // create the regex
@@ -90,7 +96,7 @@ bool dot::parser::_parse_unsigned_int (string& content, const string& regexp,
 // skips the section of contents if it contains comments. It returns the
 // contents that result after stripping the leading comments. It honors both C
 // and C++ comments (as specified in the dot language)
-void dot::parser::_parse_comments (string& contents)
+void dot::parser::_parse_comments (string& contents) const
 {
 
   // both types of comments are acknowledged using regexps. The key question is
@@ -102,7 +108,7 @@ void dot::parser::_parse_comments (string& contents)
 // parse the given contents looking for the graph type. It returns true if
 // it could find the type and false otherwise. In case the graph type is
 // successfully determined, it is returned in type.
-bool dot::parser::_parse_graph_type (string& contents, string& type)
+bool dot::parser::_parse_graph_type (string& contents, string& type) const
 {
   _parse_comments (contents);
   if (_parse_string (contents, GRAPH_TYPE, type))
@@ -119,7 +125,7 @@ bool dot::parser::_parse_graph_type (string& contents, string& type)
 // parse the given contents looking for the graph name. It returns true if
 // it could find the graph name and false otherwise.  In case the graph name
 // is successfully determined, it is returned in name.
-bool dot::parser::_parse_graph_name (string& contents, string& name)
+bool dot::parser::_parse_graph_name (string& contents, string& name) const
 {
   _parse_comments (contents);
   if (_parse_string (contents, GRAPH_NAME, name))
@@ -135,11 +141,11 @@ bool dot::parser::_parse_graph_name (string& contents, string& name)
 
 // parse the given contents looking for the beginning of a block. It returns
 // true if it is found and false otherwise.
-bool dot::parser::_parse_block_begin (string& contents)
+bool dot::parser::_parse_block_begin (string& contents) const
 {
   _parse_comments (contents);
   if (_parse_void (contents, BLOCK_BEGIN))
-    show_void ("--- Block begin found ---", _verbose);
+    _show_void ("--- Block begin found ---", _verbose);
   else {
     cerr << " Syntax error: BEGIN OF BLOCK missing" << endl;
     if (!_verbose)
@@ -152,7 +158,7 @@ bool dot::parser::_parse_block_begin (string& contents)
 // parse the given contents looking for the name of a vertex. It returns
 // true if it is found and false otherwise.  In case the vertex name is
 // successfully determined, it is returned in name.
-bool dot::parser::_parse_vertex_name (string& contents, string& name)
+bool dot::parser::_parse_vertex_name (string& contents, string& name) const
 {
   _parse_comments (contents);
   if (_parse_string (contents, VERTEX_NAME, name))
@@ -169,7 +175,7 @@ bool dot::parser::_parse_vertex_name (string& contents, string& name)
 // parse the given contents looking for the type of an edge.  It returns
 // true if it is found and false otherwise.  In case the edge type is
 // successfully determined, it is returned in edge_type.
-bool dot::parser::_parse_edge_type (string& contents, string& edge_type)
+bool dot::parser::_parse_edge_type (string& contents, string& edge_type) const
 {
   _parse_comments (contents);
   if (_parse_string (contents, EDGE_TYPE, edge_type))
@@ -205,7 +211,7 @@ bool dot::parser::_parse_target_name (string& contents, string& name,
 // parse an attributes section. The attributes read are return as a map that
 // stores for every attribute its value as a string. It returns true if any
 // attributes were found and false otherwise.
-bool dot::parser::_parse_attributes (string& contents, map<string, string>& dict)
+bool dot::parser::_parse_attributes (string& contents, map<string, string>& dict) const
 {
   // check if the current contents start with an attributes section
   if (_parse_void (contents, ATTRIBUTE_BEGIN)) {
@@ -252,25 +258,23 @@ bool dot::parser::_parse_attributes (string& contents, map<string, string>& dict
       eoattr = _parse_void (contents, ATTRIBUTE_END) || eoattr;
     }
 
-    // and return that an attribute section was processed in case that any
-    // attributes were processed
-    return (dict.size () > 0);
+    // and return that an attribute section was successfully processed
+    return true;
   }
 
   // at this point, no attribute section was processed
   return false;
 }
 
-// Public services
-// ----------------------------------------------------------------------------
-
 // show a void line
-void dot::parser::show_void (const string& line, bool verbose)
+void dot::parser::_show_void (const string& line, bool verbose) const
 {
   if (verbose)
     cout << " [" << line << "]" << endl;
 }
-  
+
+// Public services
+// ----------------------------------------------------------------------------
 
 // get all vertices of the graph
 std::vector<std::string> dot::parser::get_vertices () const
@@ -279,49 +283,81 @@ std::vector<std::string> dot::parser::get_vertices () const
 
   // now, go over the adjacency map retrieving the names of all vertices
   if (_graph.size ())
-    for (auto ivertex=_graph.begin () ; ivertex!=_graph.end () ; ++ivertex)
-      vertices.push_back (ivertex->first);
+    for (auto& ivertex : _graph)
+      vertices.push_back (ivertex.first);
 
   return vertices;
 }
 
-// get all nodes that are reachable from a given node
-std::vector<std::string> dot::parser::get_neighbours (const string name)
+// get all nodes that are reachable from a given node. In case no node is
+    // found with the given node an exception is raised.
+std::vector<std::string> dot::parser::get_neighbours (const string& name)
 {
+
+  // verify that the specified name actually exists
+  if (_graph.find (name) == _graph.end ())
+    throw invalid_argument (" No node with the name '" + name + "' has been found");
+
+  // otherwise return a vector with all neighbours of this node
   return _graph[name];
 }
 
-// get all the attributes of the specified vertex
-std::vector<std::string> dot::parser::get_vertex_attributes (const string name)
+// get all the attributes of the specified vertex. In case no node is found with
+// the given node an exception is raised.
+std::vector<std::string> dot::parser::get_vertex_attributes (const string& name)
 {
   vector<string> attrs;
+  
+  // verify that the specified name actually exists
+  if (_graph.find (name) == _graph.end ())
+    throw invalid_argument (" No node with the name '" + name + "' has been found");
 
-  // now, go over the attributes of this specific vertex, in case any has been
-  // defined
-  map<string,map<string,string>>::iterator iattrs = _vertex.find (name);
-  if (iattrs != _vertex.end ()) {
-
-    // and retrieve the attribute names defined for it
-    for (auto iattr=iattrs->second.begin () ; iattr!=iattrs->second.end () ; ++iattr)
-      attrs.push_back (iattr->first);
-  }
+  // now, go over the attributes of this specific vertex, and retrieve the
+  // attribute names defined for it
+  for (auto iattr: _vertex[name])
+    attrs.push_back (iattr.first);
+  
   return attrs;
 }
 
-// return the value of an attribute defined for a specific vertex
-std::string dot::parser::get_vertex_attribute (string name, string attrname)
+// return the value of an attribute defined for a specific vertex. In case no
+// node is found with the given node, or no attribute with the given name is
+// found for the specified node, an exception is raised.
+std::string dot::parser::get_vertex_attribute (const string& name, const string& attrname)
 {
+
+  // verify that the specified name actually exists
+  if (_graph.find (name) == _graph.end ())
+    throw invalid_argument (" No node with the name '" + name + "' has been found");
+
+  // verify there is an attribute with the given name
+  if (_vertex[name].find (attrname) == _vertex[name].end ())
+    throw invalid_argument (" The node '" + name + "' has no attribute with the name '" + attrname + "'");
+
+  // at this point, both the vertex and the attribute name are known to exist,
+  // so that report it
   return _vertex[name][attrname];
 }
 
 // get all the attributes of a specific edge qualified by its (origin,target)
-// names
-std::vector<std::string> dot::parser::get_edge_attributes (const string origin,
-							   const string target)
+// names. If either the origin does not exist, or the target is not found to be
+// a neighbour of the origin, an exception is raised.
+std::vector<std::string> dot::parser::get_edge_attributes (const string& origin,
+							   const string& target)
 {
   vector<string> attrs;
 
-  // now, verify that the pair (origin,target) exist in the map of edge
+  // verify that the specified origin actually exists
+  if (_graph.find (origin) == _graph.end ())
+    throw invalid_argument (" No node with the name '" + origin + "' has been found");
+
+  // verify now that the target is reachable from the origin. I know linear time
+  // but the list of vertices should not be expected to be too large ... I
+  // guess! ;)
+  if (find (_graph[origin].begin (), _graph[origin].end (), target) == _graph[origin].end ())
+    throw invalid_argument (" The node '" + origin + "' has no neighbour with the name '" + target + "'");
+
+  // now, verify that the pair (origin,target) exists in the map of edge
   // attributes
   typename map<string,map<string,map<string,string>>>::iterator iattrs = _edge.find (origin);
   if (iattrs!=_edge.end ()) {
@@ -329,20 +365,50 @@ std::vector<std::string> dot::parser::get_edge_attributes (const string origin,
     if (jattrs != iattrs->second.end ()) {
 
       // now, return all the attributes in this map
-      for (auto kattr=jattrs->second.begin () ; kattr != jattrs->second.end () ; ++kattr)
-	attrs.push_back (kattr->first);
+      for (auto& kattr: jattrs->second)
+	attrs.push_back (kattr.first);
     }
   }
 
   return attrs;
 }
 
-// return the value of the given attribute defined for the vertex qualified
-// by (origin,target) names
-std::string dot::parser::get_edge_attribute (const string origin,
-					     const string target,
-					     const string attr)
+// return the value of the given attribute defined for the vertex qualified by
+// (origin,target) names. If either the origin does not exist, or the target is
+// not found to be a neighbour of the origin, or no attribute is found in the
+// edge joining those two vertices, an exception is raised.
+std::string dot::parser::get_edge_attribute (const string& origin,
+					     const string& target,
+					     const string& attr)
 {
+
+  // verify that the specified origin actually exists
+  if (_graph.find (origin) == _graph.end ())
+    throw invalid_argument (" No node with the name '" + origin + "' has been found");
+
+  // verify now that the target is reachable from the origin. I know linear time
+  // but the list of vertices should not be expected to be too large ... I
+  // guess! ;)
+  if (find (_graph[origin].begin (), _graph[origin].end (), target) == _graph[origin].end ())
+    throw invalid_argument (" The node '" + origin + "' has no neighbour with the name '" + target + "'");
+
+  // now, verify that the pair (origin,target) exists in the map of edge
+  // attributes
+  typename map<string,map<string,map<string,string>>>::iterator iattrs = _edge.find (origin);
+  if (iattrs!=_edge.end ()) {
+    typename map<string,map<string,string>>::iterator jattrs = iattrs->second.find (target);
+    if (jattrs != iattrs->second.end ()) {
+
+      // in case there is no attribute with the specified name, raise an
+      // exception
+      if (jattrs->second.find (attr) == jattrs->second.end ())
+	throw invalid_argument (" The edge joining vertices '" + origin + "' and '" + target + "' has no attribute named '" + attr + "'");
+    }
+  }
+
+  // at this point, both the origin and the target are known to exist. Besides,
+  // an attribute with the specified name is known to exist for the edge joining
+  // those vertices, so just retrieve it
   return _edge[origin][target][attr];
 }
 
@@ -408,7 +474,7 @@ bool dot::parser::parse ()
 	// tried. They consist of an arbitrarily large list of vertices between
 	// curly brackets
 	if (_parse_void (contents, BLOCK_BEGIN)) {
-	  show_void (" --- Beginning multiple target specification ---", _verbose);
+	  _show_void (" --- Beginning multiple target specification ---", _verbose);
 	  bool eomts = false;           // end of multiple target specification
 	  while (!eomts) {
 
@@ -445,7 +511,7 @@ bool dot::parser::parse ()
 	      }
 	    }
 	  }
-	  show_void (" --- Ending multiple target specification ---", _verbose);
+	  _show_void (" --- Ending multiple target specification ---", _verbose);
 	}
 	else {
 	  cerr << " Syntax error: TARGET_NAME could not be parsed" << endl;
@@ -483,7 +549,7 @@ bool dot::parser::parse ()
     }
   }
 
-  show_void (" --- Block end found ---", _verbose);
+  _show_void (" --- Block end found ---", _verbose);
   
   return true;                                                 // nicely return
 }

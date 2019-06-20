@@ -74,46 +74,56 @@ namespace dot {
     
   private:
 
-    // return in contents all the contents of the file in _filename where
-    // newlines have been removed
-    bool _read_file (string& contents);
+    // return in contents all the contents of the dot file stored in _file. It
+    // returns true if the operation was successfully performed. Otherwise, it
+    // raises an exception
+    bool _read_file (string& contents) const;
     
     // the following methods parse different types according to the given
     // regexp. The second and third methods return in value the matching of the
     // given regexp.
-    bool _parse_void (string& content, const string& regexp);
-    bool _parse_string (string& content, const string& regexp, string& value);
+
+    // just simply parse a regular expression. It return true if the given
+    // string was parsed and false otherwise.
+    bool _parse_void (string& content, const string& regexp) const;
+
+    // parse a string and return its value in 'value' It return true if the
+    // given string was parsed and false otherwise.
+    bool _parse_string (string& content, const string& regexp, string& value) const;
+
+    // parse an unsigned int and return its value in 'value' It return true if
+    // the given string was parsed and false otherwise.
     bool _parse_unsigned_int (string& content, const string& regexp, 
-			      unsigned int& value);
+			      unsigned int& value) const;
 
     // skips the section of contents if it contains comments. It returns the
     // contents that result after stripping the leading comments. It honors both
     // C and C++ comments (as specified in the dot language)
-    void _parse_comments (string& contents);
+    void _parse_comments (string& contents) const;
 
     // parse the given contents looking for the graph type. It returns true if
     // it could find the type and false otherwise. In case the graph type is
     // successfully determined, it is returned in type.
-    bool _parse_graph_type (string& contents, string& type);
+    bool _parse_graph_type (string& contents, string& type) const;
 
     // parse the given contents looking for the graph name. It returns true if
     // it could find the graph name and false otherwise.  In case the graph name
     // is successfully determined, it is returned in name.
-    bool _parse_graph_name (string& contents, string& name);
+    bool _parse_graph_name (string& contents, string& name) const;
 
     // parse the given contents looking for the beginning of a block. It returns
     // true if it is found and false otherwise.
-    bool _parse_block_begin (string& contents);
+    bool _parse_block_begin (string& contents) const;
 
     // parse the given contents looking for the name of a vertex. It returns
     // true if it is found and false otherwise.  In case the vertex name is
     // successfully determined, it is returned in name.
-    bool _parse_vertex_name (string& contents, string& name);
+    bool _parse_vertex_name (string& contents, string& name) const;
 
     // parse the given contents looking for the type of an edge.  It returns
     // true if it is found and false otherwise.  In case the edge type is
     // successfully determined, it is returned in edge_type.
-    bool _parse_edge_type (string& contents, string& edge_type);
+    bool _parse_edge_type (string& contents, string& edge_type) const;
 
     // parse the given contents looking for the name of a target vertex. It then
     // uses the name of the origin vertex and the type of the edge type (that
@@ -126,17 +136,18 @@ namespace dot {
     // parse an attributes section. The attributes read are return as a map that
     // stores for every attribute its value as a string. It returns true if any
     // attributes were found and false otherwise.
-    bool _parse_attributes (string& contents, map<string, string>& dict);
+    bool _parse_attributes (string& contents, map<string, string>& dict) const;
+
+    // show a void line
+    void _show_void (const string& line, bool verbose) const;
     
   public:
 
-    // Default constructor
-    parser ()
-      : _filename {""}
-    { }
+    // Default constructor are forbidden
+    parser () = delete;
     
     // Explicit constructor
-    parser (string filename)
+    parser (const string& filename)
       : _filename {filename}
     { }
 
@@ -146,28 +157,32 @@ namespace dot {
     string get_name () const
     { return _name; }
 
-    // show a void line
-    void show_void (const string& line, bool verbose);
-    
     // get all vertices of the graph
     vector<string> get_vertices () const;
     
-    // get all nodes that are reachable from a given node
-    vector<string> get_neighbours (const string name);
+    // get all nodes that are reachable from a given node. In case no node is
+    // found with the given node an exception is raised.
+    vector<string> get_neighbours (const string& name);
     
-    // get all the attributes of the specified vertex
-    vector<string> get_vertex_attributes (const string name);
+    // get all the attributes of the specified vertex. In case no node is found
+    // with the given node an exception is raised.
+    vector<string> get_vertex_attributes (const string& name);
   
-    // return the value of an attribute defined for a specific vertex
-    string get_vertex_attribute (string name, string attrname);
+    // return the value of an attribute defined for a specific vertex. In case
+    // no node is found with the given node, or no attribute with the given name
+    // is found for the specified node, an exception is raised.
+    string get_vertex_attribute (const string& name, const string& attrname);
 
     // get all the attributes of a specific edge qualified by its
-    // (origin,target) names
-    vector<string> get_edge_attributes (const string origin, const string target);
+    // (origin,target) names. If either the origin does not exist, or the target
+    // is not found to be a neighbour of the origin, an exception is raised.
+    vector<string> get_edge_attributes (const string& origin, const string& target);
 
     // return the value of the given attribute defined for the vertex qualified
-    // by (origin,target) names
-    string get_edge_attribute (const string origin, const string target, const string attr);
+    // by (origin,target) names. If either the origin does not exist, or the
+    // target is not found to be a neighbour of the origin, or no attribute is
+    // found in the edge joining those two vertices, an exception is raised.
+    string get_edge_attribute (const string& origin, const string& target, const string& attr);
 
     // set the filename to parse
     void set_filename (string filename)
