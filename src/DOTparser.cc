@@ -155,6 +155,32 @@ bool dot::parser::_parse_block_begin (string& contents) const
   return true;
 }
 
+// parse the given contents looking for an assignment to a label id. It
+// returns true if it is found and false otherwise. In case a label id is
+// successfully determined, it is returned in name.
+bool dot::parser::_parse_label_id (string& contents, string& name) const
+{
+  _parse_comments (contents);
+  if (_parse_string (contents, LABEL_ASSIGNMENT, name))
+    show_value ("LABEL ID", name, _verbose);
+  else
+    return false;
+  return true;
+}
+    
+// parse the given contents looking for a value to assign to a label. It returns
+// true if it is found and false otherwise. In case a value is successfully
+// determined, it is returned in value.
+bool dot::parser::_parse_label_value (string& contents, string& value) const
+{
+  _parse_comments (contents);
+  if (_parse_string (contents, LABEL_VALUE, value))
+    show_value ("LABEL VALUE", value, _verbose);
+  else
+    return false;
+  return true;
+}
+    
 // parse the given contents looking for the name of a vertex. It returns
 // true if it is found and false otherwise.  In case the vertex name is
 // successfully determined, it is returned in name.
@@ -163,12 +189,8 @@ bool dot::parser::_parse_vertex_name (string& contents, string& name) const
   _parse_comments (contents);
   if (_parse_string (contents, VERTEX_NAME, name))
     show_value ("VERTEX NAME", name, _verbose);
-  else {
-    cerr << " Syntax error: VERTEX_NAME could not be parsed" << endl;
-    if (!_verbose)
-      cerr << " try --verbose to obtain additional information" << endl;
+  else
     return false;
-  }
   return true;
 }
 
@@ -276,15 +298,38 @@ void dot::parser::_show_void (const string& line, bool verbose) const
 // Public services
 // ----------------------------------------------------------------------------
 
+// get all labels of this graph
+std::vector<std::string> dot::parser::get_labels () const
+{
+  vector<string> labels;
+
+  // now, go over the adjacency map retrieving the names of all vertices
+  for (auto& ilabel : _label)
+    labels.push_back (ilabel.first);
+
+  return labels;
+}
+
+// get the value of the label with the specified name
+std::string dot::parser::get_label_value (const string& name)
+{
+
+  // verify that the specified label actually exists
+  if (_label.find (name) == _label.end ())
+    throw invalid_argument (" No label with the name '" + name + "' has been found");
+
+  // otherwise return the value of this label
+  return _label[name];
+}
+    
 // get all vertices of the graph
 std::vector<std::string> dot::parser::get_vertices () const
 {
   vector<string> vertices;
 
   // now, go over the adjacency map retrieving the names of all vertices
-  if (_graph.size ())
-    for (auto& ivertex : _graph)
-      vertices.push_back (ivertex.first);
+  for (auto& ivertex : _graph)
+    vertices.push_back (ivertex.first);
 
   return vertices;
 }
@@ -446,10 +491,37 @@ bool dot::parser::parse ()
     _parse_comments (contents);
     if (!(eob=_parse_void (contents, BLOCK_END))) {
 
-      // get the next vertex name
+      // at the beginning of each line we could have either a vertex name, or a
+      // label. Try first, reading a label
       string orig_name;
-      if (!_parse_vertex_name (contents, orig_name))
-	return false;
+      if (_parse_label_id (contents, orig_name)) {
+
+	string label_value;
+	if (!_parse_label_value (contents, label_value)) {
+	  cerr << " Syntax error: it was not possible to read a LABEL_VALUE" << endl;
+	  if (!_verbose)
+	    cerr << " try --verbose to obtain additional information" << endl;
+	  return false;
+	}
+
+	// if a value could be successfully processed for this label, then store
+	// it
+	_label[orig_name] = label_value;
+
+	// this completes the processing of a single statement, consume the
+	// semicolon in case it has been given
+	_parse_comments (contents);
+	_parse_void (contents, END_OF_STATEMENT);
+
+	continue;
+      }
+      else 
+	if (!_parse_vertex_name (contents, orig_name)) {
+	  cerr << " Syntax error: neither a VERTEX_NAME nor a LABEL_ID have been provided" << endl;
+	  if (!_verbose)
+	    cerr << " try --verbose to obtain additional information" << endl;
+	  return false;
+	}
 
       // and process also its attributes
       map<string, string> origdict;
@@ -458,8 +530,12 @@ bool dot::parser::parse ()
 
       // now, get the edge type, either directed or undirected
       string edge_type;
-      if (!_parse_edge_type (contents, edge_type))
+      if (!_parse_edge_type (contents, edge_type)) {
+	cerr << " Syntax error: neither an EDGE_TYPE nor an ASSIGNMENT have been provided" << endl;
+	if (!_verbose)
+	  cerr << " try --verbose to obtain additional information" << endl;
 	return false;
+      }
 
       // and process its attributes
       map<string, string> arcdict;

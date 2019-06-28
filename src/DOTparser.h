@@ -54,6 +54,10 @@ namespace dot {
     // vertex name given in the dot file. Each entry of the map consists then of
     // a vector of adjacent vertices
     map<string, vector<string>> _graph;
+
+    // graphs can contain an arbitrary collection of labels which must be given
+    // a value. These are stored in the following data member
+    map<string, string> _label;
     
     // each graph is made of vertices and edges which can be characterized with
     // attributes. These are stored in a couple of maps:
@@ -115,6 +119,16 @@ namespace dot {
     // true if it is found and false otherwise.
     bool _parse_block_begin (string& contents) const;
 
+    // parse the given contents looking for an assignment to a label id. It
+    // returns true if it is found and false otherwise. In case a label id is
+    // successfully determined, it is returned in name.
+    bool _parse_label_id (string& contents, string& name) const;
+    
+    // parse the given contents looking for a value to assign to a label. It
+    // returns true if it is found and false otherwise. In case a value is
+    // successfully determined, it is returned in value.
+    bool _parse_label_value (string& contents, string& value) const;
+  
     // parse the given contents looking for the name of a vertex. It returns
     // true if it is found and false otherwise.  In case the vertex name is
     // successfully determined, it is returned in name.
@@ -157,6 +171,12 @@ namespace dot {
     string get_name () const
     { return _name; }
 
+    // get all labels of this graph
+    vector<string> get_labels () const;
+
+    // get the value of the label with the specified name
+    string get_label_value (const string& name);
+    
     // get all vertices of the graph
     vector<string> get_vertices () const;
     
