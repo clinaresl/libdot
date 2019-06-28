@@ -40,8 +40,8 @@
 
 #define ATTRIBUTE_BEGIN "^[[:space:]]*\\["
 #define ATTRIBUTE_NAME "^[[:space:]]*(([[:alnum:]]|_)+)[[:space:]]*="
-#define ATTRIBUTE_VALUE_NEXT "^[[:space:]]*((([+-]?(\\.[[:digit:]]|[[:digit:]]+(\\.[[:digit:]]*)?))|([[:alnum:]])|(_|\".*\")+))[[:space:]]*,"
-#define ATTRIBUTE_VALUE_END "^[[:space:]]*((([+-]?(\\.[[:digit:]]|[[:digit:]]+(\\.[[:digit:]]*)?))|([[:alnum:]])|(_|\"[^\"]*\")+))[[:space:]]*\\]"
+#define ATTRIBUTE_VALUE_NEXT "^[[:space:]]*((([+-]?(\\.[[:digit:]]|[[:digit:]]+(\\.[[:digit:]]*)?))|([[:alnum:]])+|(\".*\")+))[[:space:]]*,"
+#define ATTRIBUTE_VALUE_END "^[[:space:]]*((([+-]?(\\.[[:digit:]]|[[:digit:]]+(\\.[[:digit:]]*)?))|([[:alnum:]]+)|(\"[^\"]*\")+))[[:space:]]*\\]"
 #define ATTRIBUTE_END "^[[:space:]]*\\]"
 
 namespace dot {

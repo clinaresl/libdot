@@ -541,7 +541,7 @@ bool dot::parser::parse ()
       map<string, string> targetdict;
       if (_parse_attributes (contents, targetdict))
 	_vertex [target_name] = targetdict;
-      
+
       // this completes the processing of a single statement, consume the
       // semicolon in case it has been given
       _parse_comments (contents);
