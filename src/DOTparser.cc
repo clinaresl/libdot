@@ -202,12 +202,8 @@ bool dot::parser::_parse_edge_type (string& contents, string& edge_type) const
   _parse_comments (contents);
   if (_parse_string (contents, EDGE_TYPE, edge_type))
     show_value ("EDGE TYPE", edge_type, _verbose);
-  else {
-    cerr << " Syntax error: EDGE_TYPE could not be parsed" << endl;
-    if (!_verbose)
-      cerr << " try --verbose to obtain additional information" << endl;
+  else 
     return false;
-  }
   return true;
 }
 
@@ -639,11 +635,33 @@ bool dot::parser::parse ()
 
       // if the target was given in single form, then process the attributes of
       // the edge from its origin, if given
-      else 
+      else {
 	
 	// process now the edge attributes given to this vertex and, if given,
 	// the attributes of the target vertex as well
 	_process_single_vertex (contents, orig_name, edge_type, target_name, arcdict);
+
+	// now, maybe a trajectory is listed ---which is only allowed with
+	// single vertices. Check now whether an edge follows
+	while (_parse_edge_type (contents, edge_type)) {
+
+	  map<string, string> nestedarcdict;
+	  
+	  // yeah! A path is listed, so make the target vertex the origin, and
+	  // parse the attributes of this edge if any were given
+	  orig_name = target_name;
+	  _parse_attributes (contents, nestedarcdict);
+	  if (!_parse_target_name (contents, target_name, orig_name, edge_type)) {
+
+	    cerr << " Syntax error: a VERTEX_NAME could not be found while parsing a path" << endl;
+	    if (!_verbose)
+	      cerr << " try --verbose to obtain additional information" << endl;
+	    return false;
+	  }
+	  else
+	    _process_single_vertex (contents, orig_name, edge_type, target_name, nestedarcdict);
+	}
+      }
 
       // this completes the processing of a single statement, consume the
       // semicolon in case it has been given
