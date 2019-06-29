@@ -288,6 +288,105 @@ bool dot::parser::_parse_attributes (string& contents, map<string, string>& dict
   return false;
 }
 
+// process the value of a label named labelid. This method should be invoked
+// only when a label identifier has been found in contents which should then
+// start with the value of the label. It returns true if it could
+// successfully determine the label value and false otherwise.
+bool dot::parser::_process_label_value (string& contents, const string& labelid)
+{
+
+  string label_value;
+  if (!_parse_label_value (contents, label_value)) {
+    cerr << " Syntax error: it was not possible to read a LABEL_VALUE" << endl;
+    if (!_verbose)
+      cerr << " try --verbose to obtain additional information" << endl;
+    return false;
+  }
+  
+  // if a value could be successfully processed for this label, then store
+  // it
+  _label[labelid] = label_value;
+  return true;
+}
+
+// process the attributes of an edge joining two single vertices, orig_name and
+// target_name, of the specified type edge_type, given in arcdict. It also
+// processes the attributes of the target vertex if any are given in
+// contents. It returns true upon successful completion and false otherwise
+bool dot::parser::_process_single_vertex (string& contents,
+					  const string& orig_name, const string& edge_type,
+					  const string& target_name, map<string, string>& arcdict)
+{
+
+  // first, process the edge attributes: if and only if any edge attributes were
+  // given
+  if (arcdict.size ()) {
+
+    // Syntax: [orig][target][attr name] = attr value
+    _edge[orig_name][target_name] = arcdict;
+
+    // also, in case this is an edge of the form "--" then annotate the same
+    // attribute to the reversed direction
+    if (edge_type == "--")
+      _edge[target_name][orig_name] = arcdict;
+  }
+		
+  // and process also this vertex attributes, if given
+  map<string, string> targetdict;
+  if (_parse_attributes (contents, targetdict))
+    _vertex [target_name] = targetdict;
+
+  return true;
+}
+    
+// process a multiple declaration of target vertices which should appear right
+// at the beginning of the specified contents. The original vertex, type of edge
+// and any edge attributes specified previously should be given now in
+// orig_name, edge_type and arcdict. It returns true if and only if the block
+// could be successfully parsed and false otherwise.
+bool dot::parser::_process_multiple_vertices (string& contents, const string& orig_name,
+					      const string& edge_type, map<string, string>& arcdict)
+{
+
+  string target_name;
+  
+  // Multiple targets consist of an arbitrarily large list of vertices between
+  // curly brackets
+  if (_parse_void (contents, BLOCK_BEGIN)) {
+    _show_void (" --- Beginning multiple target specification ---", _verbose);
+    bool eomts = false;           // end of multiple target specification
+    while (!eomts) {
+
+      // unless the multiple target specification is over
+      _parse_comments (contents);
+      if (!(eomts=_parse_void (contents, BLOCK_END))) {
+
+	// get the next vertex name
+	if (!_parse_target_name (contents, target_name, orig_name, edge_type)) {
+	  cerr << " Syntax error: TARGET_NAME could not be parsed" << endl;
+	  if (!_verbose)
+	    cerr << " try --verbose to obtain additional information" << endl;
+	  return false;
+	}
+	else
+
+	  // process now the edge attributes given to this vertex and, if given,
+	  // the attributes of the target vertex as well
+	  _process_single_vertex (contents, orig_name, edge_type, target_name, arcdict);
+      }
+    }
+    _show_void (" --- Ending multiple target specification ---", _verbose);
+  }
+  else {
+    cerr << " Syntax error: TARGET_NAME could not be parsed" << endl;
+    if (!_verbose)
+      cerr << " try --verbose to obtain additional information" << endl;
+    return false;
+  }
+
+  return true;
+}
+
 // show a void line
 void dot::parser::_show_void (const string& line, bool verbose) const
 {
@@ -496,23 +595,14 @@ bool dot::parser::parse ()
       string orig_name;
       if (_parse_label_id (contents, orig_name)) {
 
-	string label_value;
-	if (!_parse_label_value (contents, label_value)) {
-	  cerr << " Syntax error: it was not possible to read a LABEL_VALUE" << endl;
-	  if (!_verbose)
-	    cerr << " try --verbose to obtain additional information" << endl;
-	  return false;
-	}
-
-	// if a value could be successfully processed for this label, then store
-	// it
-	_label[orig_name] = label_value;
+	// if a label was found, then retrieve its value and store it in this
+	// parser
+	_process_label_value (contents, orig_name);
 
 	// this completes the processing of a single statement, consume the
 	// semicolon in case it has been given
 	_parse_comments (contents);
 	_parse_void (contents, END_OF_STATEMENT);
-
 	continue;
       }
       else 
@@ -544,79 +634,16 @@ bool dot::parser::parse ()
       // the target can be specified in two different forms: either single or
       // multiple. A single target consists uniquely of a single vertex
       string target_name;
-      if (!_parse_target_name (contents, target_name, orig_name, edge_type)) {
-	
-	// if a single target was not recognized, then multiple targets are
-	// tried. They consist of an arbitrarily large list of vertices between
-	// curly brackets
-	if (_parse_void (contents, BLOCK_BEGIN)) {
-	  _show_void (" --- Beginning multiple target specification ---", _verbose);
-	  bool eomts = false;           // end of multiple target specification
-	  while (!eomts) {
-
-	    // unless the multiple target specification is over
-	    _parse_comments (contents);
-	    if (!(eomts=_parse_void (contents, BLOCK_END))) {
-
-	      // get the next vertex name
-	      if (!_parse_target_name (contents, target_name, orig_name, edge_type)) {
-		cerr << " Syntax error: TARGET_NAME could not be parsed" << endl;
-		if (!_verbose)
-		  cerr << " try --verbose to obtain additional information" << endl;
-		return false;
-	      }
-	      else {
-
-		// first, process the edge attributes: if and only if any edge
-		// attributes were given
-		if (arcdict.size ()) {
-
-		  // Syntax: [orig][target][attr name] = attr value
-		  _edge[orig_name][target_name] = arcdict;
-
-		  // also, in case this is an edge of the form "--" then
-		  // annotate the same attribute to the reversed direction
-		  if (edge_type == "--")
-		    _edge[target_name][orig_name] = arcdict;
-		}
-		
-		// and process also this vertex attributes, if given
-		map<string, string> targetdict;
-		if (_parse_attributes (contents, targetdict))
-		  _vertex [target_name] = targetdict;
-	      }
-	    }
-	  }
-	  _show_void (" --- Ending multiple target specification ---", _verbose);
-	}
-	else {
-	  cerr << " Syntax error: TARGET_NAME could not be parsed" << endl;
-	  if (!_verbose)
-	    cerr << " try --verbose to obtain additional information" << endl;
-	  return false;
-	}
-      }
+      if (!_parse_target_name (contents, target_name, orig_name, edge_type))
+	_process_multiple_vertices (contents, orig_name, edge_type, arcdict);
 
       // if the target was given in single form, then process the attributes of
       // the edge from its origin, if given
       else 
 	
-	// if and only if any edge attributes were given
-	if (arcdict.size ()) {
-
-	  // Syntax: [orig][target][attr name] = attr value
-	  _edge[orig_name][target_name] = arcdict;
-
-	  // also, in case this is an edge of the form "--" then
-	  // annotate the same attribute to the reversed direction
-	  if (edge_type == "--")
-	    _edge[target_name][orig_name] = arcdict;
-	}
-
-      // process now the attributes of the target vertex, if given
-      map<string, string> targetdict;
-      if (_parse_attributes (contents, targetdict))
-	_vertex [target_name] = targetdict;
+	// process now the edge attributes given to this vertex and, if given,
+	// the attributes of the target vertex as well
+	_process_single_vertex (contents, orig_name, edge_type, target_name, arcdict);
 
       // this completes the processing of a single statement, consume the
       // semicolon in case it has been given

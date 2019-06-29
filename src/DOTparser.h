@@ -152,6 +152,28 @@ namespace dot {
     // attributes were found and false otherwise.
     bool _parse_attributes (string& contents, map<string, string>& dict) const;
 
+    // process the value of a label named labelid. This method should be invoked
+    // only when a label identifier has been found in contents which should then
+    // start with the value of the label. It returns true if it could
+    // successfully determine the label value and false otherwise.
+    bool _process_label_value (string& contents, const string& labelid);
+
+    // process the attributes of an edge joining two single vertices, orig_name
+    // and target_name, of the specified type edge_type, given in arcdict. It
+    // also processes the attributes of the target vertex if any are given in
+    // contents. It returns true upon successful completion and false otherwise
+    bool _process_single_vertex (string& contents,
+				 const string& orig_name, const string& edge_type,
+				 const string& target_name, map<string, string>& arcdict);
+  
+    // process a multiple declaration of target vertices which should appear
+    // right at the beginning of the specified contents. The original vertex,
+    // type of edge and any edge attributes specified previously should be given
+    // now in orig_name, edge_type and arcdict. It returns true if and only if
+    // the block could be successfully parsed and false otherwise.
+    bool _process_multiple_vertices (string& contents, const string& orig_name,
+				     const string& edge_type, map<string, string>& arcdict);
+
     // show a void line
     void _show_void (const string& line, bool verbose) const;
     
