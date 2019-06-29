@@ -383,6 +383,43 @@ bool dot::parser::_process_multiple_vertices (string& contents, const string& or
   return true;
 }
 
+// process a trajectory or path defined over single definitions of vertices
+// from the origin vertex specified. It returns true upon successful
+// completion of the trajectory and false otherwise
+bool dot::parser::_process_trajectory (string& contents, string& orig_name)
+{
+
+  string edge_type;
+  string target_name;
+  
+  // while an edge is found in contents
+  while (_parse_edge_type (contents, edge_type)) {
+
+    map<string, string> nestedarcdict;
+	  
+    // yeah! A path is listed, so make the target vertex the origin, and
+    // parse the attributes of this edge if any were given
+    orig_name = target_name;
+    _parse_attributes (contents, nestedarcdict);
+
+    // get the target vertex of this specific edge
+    if (!_parse_target_name (contents, target_name, orig_name, edge_type)) {
+
+      cerr << " Syntax error: a VERTEX_NAME could not be found while parsing a path" << endl;
+      if (!_verbose)
+	cerr << " try --verbose to obtain additional information" << endl;
+      return false;
+    }
+    else
+
+      // and update all the edge attributes of this edge and also the attributes
+      // of the target vertex if any were given
+      _process_single_vertex (contents, orig_name, edge_type, target_name, nestedarcdict);
+  }
+
+  return true;
+}
+
 // show a void line
 void dot::parser::_show_void (const string& line, bool verbose) const
 {
@@ -642,25 +679,9 @@ bool dot::parser::parse ()
 	_process_single_vertex (contents, orig_name, edge_type, target_name, arcdict);
 
 	// now, maybe a trajectory is listed ---which is only allowed with
-	// single vertices. Check now whether an edge follows
-	while (_parse_edge_type (contents, edge_type)) {
-
-	  map<string, string> nestedarcdict;
-	  
-	  // yeah! A path is listed, so make the target vertex the origin, and
-	  // parse the attributes of this edge if any were given
-	  orig_name = target_name;
-	  _parse_attributes (contents, nestedarcdict);
-	  if (!_parse_target_name (contents, target_name, orig_name, edge_type)) {
-
-	    cerr << " Syntax error: a VERTEX_NAME could not be found while parsing a path" << endl;
-	    if (!_verbose)
-	      cerr << " try --verbose to obtain additional information" << endl;
-	    return false;
-	  }
-	  else
-	    _process_single_vertex (contents, orig_name, edge_type, target_name, nestedarcdict);
-	}
+	// single vertices. Note that the origin vertex of the trajectory is the
+	// target vertex of the preceding edge.
+	_process_trajectory (contents, target_name);
       }
 
       // this completes the processing of a single statement, consume the

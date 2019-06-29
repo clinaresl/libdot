@@ -174,6 +174,11 @@ namespace dot {
     bool _process_multiple_vertices (string& contents, const string& orig_name,
 				     const string& edge_type, map<string, string>& arcdict);
 
+    // process a trajectory or path defined over single definitions of vertices
+    // from the origin vertex specified. It returns true upon successful
+    // completion of the trajectory and false otherwise
+    bool _process_trajectory (string& contents, string& orig_name);
+    
     // show a void line
     void _show_void (const string& line, bool verbose) const;
     
