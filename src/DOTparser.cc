@@ -538,6 +538,15 @@ bool dot::parser::parse ()
       if (_process_attributes (contents, origdict))
 	_vertex [orig_name] = origdict;
 
+      // at this point, the statement could be over if it is a "node statement",
+      // i.e., a node along with its attributes. In this case, the statement
+      // should be ended with a semicolon
+      _parse_comments (contents);
+      if (_parse_void (contents, END_OF_STATEMENT))
+
+	// if so, just proceed with the next line
+	continue;
+
       // now, get the edge type, either directed or undirected
       string edge_type;
       if (!_read_string (contents, EDGE_TYPE, edge_type, "EDGE TYPE"))
