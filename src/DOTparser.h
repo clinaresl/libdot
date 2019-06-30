@@ -22,6 +22,7 @@
 
 #include "DOTdefs.h"
 
+#include <exception>
 #include <fstream>
 #include <iostream>
 #include <map>
@@ -34,6 +35,25 @@ namespace dot {
 
   using namespace std;
 
+  // Struct definition
+  //
+  // Definition of a syntax error exception
+  struct syntax_error : public exception {
+
+    string _msg;                                        // syntax error message
+    
+    explicit syntax_error (const string& msg)
+      : _msg { msg }
+    {}
+      
+    virtual const char * what () const throw () {
+      return _msg.c_str ();
+    }
+  };
+
+  // Class deifnition
+  //
+  // Definition of a dot parser
   class parser {
 
   private:

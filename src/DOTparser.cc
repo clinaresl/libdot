@@ -149,7 +149,7 @@ bool dot::parser::_process_attributes (string& contents, map<string, string>& di
       if (_parse_string (contents, ATTRIBUTE_NAME, attrname)) 
 	show_value ("\tATTRIBUTE", attrname, _verbose);
       else 
-	throw invalid_argument ("Syntax error: an ATTRIBUTE_NAME could not be parsed");
+	throw dot::syntax_error ("an ATTRIBUTE_NAME could not be parsed");
 
       // try first to read the value of this attribute followed by and end
       // of attribute section (']')
@@ -171,7 +171,7 @@ bool dot::parser::_process_attributes (string& contents, map<string, string>& di
       // if neither the attribute section is finished nor it is continued with
       // other assignments, then an error should be raise
       else 
-	throw invalid_argument ("Syntax error: an ATTRIBUTE_VALUE could not be parsed");
+	throw dot::syntax_error ("an ATTRIBUTE_VALUE could not be parsed");
 
       // check anyway if the attributes section gets closed here (this is good,
       // e.g., for preventing empty attributes sections)
@@ -195,7 +195,7 @@ bool dot::parser::_process_label_value (string& contents, const string& labelid)
 
   string label_value;
   if (!_read_string (contents, LABEL_VALUE, label_value, "LABEL VALUE"))
-    throw invalid_argument ("Syntax error: it was not possible to read a LABEL_VALUE");
+    throw dot::syntax_error ("it was not possible to read a LABEL_VALUE");
   
   // if a value could be successfully processed for this label, then store
   // it
@@ -257,7 +257,7 @@ bool dot::parser::_process_multiple_vertices (string& contents, const string& or
 
 	// get the next vertex name
 	if (!_read_string (contents, VERTEX_NAME, target_name, "TARGET VERTEX"))
-	  throw invalid_argument ("Syntax error: TARGET_NAME could not be parsed");
+	  throw dot::syntax_error ("TARGET_NAME could not be parsed");
 	else {
 
 	  _graph[orig_name].push_back (target_name);
@@ -273,7 +273,7 @@ bool dot::parser::_process_multiple_vertices (string& contents, const string& or
     show_void (" --- Ending multiple target specification ---", _verbose);
   }
   else
-    throw invalid_argument ("Syntax error: TARGET_NAME could not be parsed");
+    throw dot::syntax_error ("TARGET_NAME could not be parsed");
 
   return true;
 }
@@ -299,7 +299,7 @@ bool dot::parser::_process_trajectory (string& contents, string& orig_name)
 
     // get the target vertex of this specific edge
     if (!_read_string (contents, VERTEX_NAME, target_name, "TARGET VERTEX"))
-      throw invalid_argument ("Syntax error: a VERTEX_NAME could not be found while parsing a path");
+      throw dot::syntax_error ("a VERTEX_NAME could not be found while parsing a path");
     else {
 
       _graph[orig_name].push_back (target_name);
@@ -336,7 +336,7 @@ std::string dot::parser::get_label_value (const string& name)
 
   // verify that the specified label actually exists
   if (_label.find (name) == _label.end ())
-    throw invalid_argument (" No label with the name '" + name + "' has been found");
+    throw dot::syntax_error (" No label with the name '" + name + "' has been found");
 
   // otherwise return the value of this label
   return _label[name];
@@ -361,7 +361,7 @@ std::vector<std::string> dot::parser::get_neighbours (const string& name)
 
   // verify that the specified name actually exists
   if (_graph.find (name) == _graph.end ())
-    throw invalid_argument (" No node with the name '" + name + "' has been found");
+    throw dot::syntax_error (" No node with the name '" + name + "' has been found");
 
   // otherwise return a vector with all neighbours of this node
   return _graph[name];
@@ -375,7 +375,7 @@ std::vector<std::string> dot::parser::get_vertex_attributes (const string& name)
   
   // verify that the specified name actually exists
   if (_graph.find (name) == _graph.end ())
-    throw invalid_argument (" No node with the name '" + name + "' has been found");
+    throw dot::syntax_error (" No node with the name '" + name + "' has been found");
 
   // now, go over the attributes of this specific vertex, and retrieve the
   // attribute names defined for it
@@ -393,11 +393,11 @@ std::string dot::parser::get_vertex_attribute (const string& name, const string&
 
   // verify that the specified name actually exists
   if (_graph.find (name) == _graph.end ())
-    throw invalid_argument (" No node with the name '" + name + "' has been found");
+    throw dot::syntax_error (" No node with the name '" + name + "' has been found");
 
   // verify there is an attribute with the given name
   if (_vertex[name].find (attrname) == _vertex[name].end ())
-    throw invalid_argument (" The node '" + name + "' has no attribute with the name '" + attrname + "'");
+    throw dot::syntax_error (" The node '" + name + "' has no attribute with the name '" + attrname + "'");
 
   // at this point, both the vertex and the attribute name are known to exist,
   // so that report it
@@ -414,13 +414,13 @@ std::vector<std::string> dot::parser::get_edge_attributes (const string& origin,
 
   // verify that the specified origin actually exists
   if (_graph.find (origin) == _graph.end ())
-    throw invalid_argument (" No node with the name '" + origin + "' has been found");
+    throw dot::syntax_error (" No node with the name '" + origin + "' has been found");
 
   // verify now that the target is reachable from the origin. I know linear time
   // but the list of vertices should not be expected to be too large ... I
   // guess! ;)
   if (find (_graph[origin].begin (), _graph[origin].end (), target) == _graph[origin].end ())
-    throw invalid_argument (" The node '" + origin + "' has no neighbour with the name '" + target + "'");
+    throw dot::syntax_error (" The node '" + origin + "' has no neighbour with the name '" + target + "'");
 
   // now, verify that the pair (origin,target) exists in the map of edge
   // attributes
@@ -449,13 +449,13 @@ std::string dot::parser::get_edge_attribute (const string& origin,
 
   // verify that the specified origin actually exists
   if (_graph.find (origin) == _graph.end ())
-    throw invalid_argument (" No node with the name '" + origin + "' has been found");
+    throw dot::syntax_error (" No node with the name '" + origin + "' has been found");
 
   // verify now that the target is reachable from the origin. I know linear time
   // but the list of vertices should not be expected to be too large ... I
   // guess! ;)
   if (find (_graph[origin].begin (), _graph[origin].end (), target) == _graph[origin].end ())
-    throw invalid_argument (" The node '" + origin + "' has no neighbour with the name '" + target + "'");
+    throw dot::syntax_error (" The node '" + origin + "' has no neighbour with the name '" + target + "'");
 
   // now, verify that the pair (origin,target) exists in the map of edge
   // attributes
@@ -467,7 +467,7 @@ std::string dot::parser::get_edge_attribute (const string& origin,
       // in case there is no attribute with the specified name, raise an
       // exception
       if (jattrs->second.find (attr) == jattrs->second.end ())
-	throw invalid_argument (" The edge joining vertices '" + origin + "' and '" + target + "' has no attribute named '" + attr + "'");
+	throw dot::syntax_error (" The edge joining vertices '" + origin + "' and '" + target + "' has no attribute named '" + attr + "'");
     }
   }
 
@@ -495,17 +495,17 @@ bool dot::parser::parse ()
   // REMARK - "strict" is not acknowledged!
   string type;
   if (!_read_string (contents, GRAPH_TYPE, type, "TYPE"))
-    throw invalid_argument ("Syntax error: GRAPH type could not be parsed");
+    throw dot::syntax_error ("GRAPH type could not be parsed");
   
   // get the graph name
   // REMARK - the graph name is entirely optional
   string name;
   if (!_read_string (contents, GRAPH_NAME, name, "NAME"))
-    throw invalid_argument ("Syntax error: NAME could not be parsed");
+    throw dot::syntax_error ("NAME could not be parsed");
   
   // block start
   if (!_read_void (contents, BLOCK_BEGIN, "--- Block begin found ---"))
-    throw invalid_argument ("Syntax error: BEGIN OF BLOCK missing");
+    throw dot::syntax_error ("BEGIN OF BLOCK missing");
   
   // now, process all edges of the graph
   while (!eob) {
@@ -531,7 +531,7 @@ bool dot::parser::parse ()
       }
       else 
 	if (!_read_string (contents, VERTEX_NAME, orig_name, "SOURCE_VERTEX"))
-	  throw invalid_argument ("Syntax error: neither a VERTEX_NAME nor a LABEL_ID have been provided");
+	  throw dot::syntax_error ("neither a VERTEX_NAME nor a LABEL_ID have been provided");
 
       // and process also its attributes
       map<string, string> origdict;
@@ -541,7 +541,7 @@ bool dot::parser::parse ()
       // now, get the edge type, either directed or undirected
       string edge_type;
       if (!_read_string (contents, EDGE_TYPE, edge_type, "EDGE TYPE"))
-	throw invalid_argument ("Syntax error: no EDGE_TYPE has been provided");
+	throw dot::syntax_error ("no EDGE_TYPE has been provided");
 
       // and process its attributes. Note that at this point, the edge
       // attributes are only parsed and saved. They are written to the private

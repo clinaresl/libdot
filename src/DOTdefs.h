@@ -28,7 +28,7 @@
 #include <string>
 
 // Specification part
-#define GRAPH_TYPE R"((digraph|graph))"
+#define GRAPH_TYPE R"(^[[:space:]]*(digraph|graph))"
 #define GRAPH_NAME R"(^[[:space:]]*([\-0-9a-zA-Z_]*))"
 #define BLOCK_BEGIN R"(^[[:space:]]*\{)"
 #define BLOCK_END R"(^[[:space:]]*})"
