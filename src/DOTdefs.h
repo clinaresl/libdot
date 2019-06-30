@@ -28,32 +28,39 @@
 #include <string>
 
 // Specification part
-#define GRAPH_TYPE R"(^[[:space:]]*([[:alnum:]]+))"
+#define GRAPH_TYPE R"((digraph|graph))"
 #define GRAPH_NAME R"(^[[:space:]]*([\-0-9a-zA-Z_]*))"
-#define BLOCK_BEGIN "^[[:space:]]*\\{"
-#define BLOCK_END "^[[:space:]]*}"
-#define LABEL_ASSIGNMENT "^[[:space:]]*(([[:alnum:]])+)[[:space:]]*="
-#define LABEL_VALUE "^[[:space:]]*((([+-]?(\\.[[:digit:]]|[[:digit:]]+(\\.[[:digit:]]*)?))|([[:alnum:]])+|(\".*\")+))[[:space:]]*"
-#define VERTEX_NAME "^[[:space:]]*([[:alnum:]]+)"
-#define EDGE_TYPE "^[[:space:]]*(--|->)"
-#define END_OF_STATEMENT "^[[:space:]]*;"
-#define CPP_COMMENT "^[[:space:]]*//.*\n"
+#define BLOCK_BEGIN R"(^[[:space:]]*\{)"
+#define BLOCK_END R"(^[[:space:]]*})"
+#define LABEL_ASSIGNMENT R"(^[[:space:]]*(([[:alnum:]])+)[[:space:]]*=)"
+#define LABEL_VALUE R"(^[[:space:]]*((([+-]?(\.[[:digit:]]|[[:digit:]]+(\.[[:digit:]]*)?))|([[:alnum:]])+|(\".*\")+))[[:space:]]*)"
+#define VERTEX_NAME R"(^[[:space:]]*([[:alnum:]]+))"
+#define EDGE_TYPE R"(^[[:space:]]*(--|->))"
+#define END_OF_STATEMENT R"(^[[:space:]]*;)"
+#define CPP_COMMENT R"(^[[:space:]]*//.*\n)"
 
-#define ATTRIBUTE_BEGIN "^[[:space:]]*\\["
-#define ATTRIBUTE_NAME "^[[:space:]]*(([[:alnum:]])+)[[:space:]]*="
-#define ATTRIBUTE_VALUE_NEXT "^[[:space:]]*((([+-]?(\\.[[:digit:]]|[[:digit:]]+(\\.[[:digit:]]*)?))|([[:alnum:]])+|(\".*\")+))[[:space:]]*,"
-#define ATTRIBUTE_VALUE_END "^[[:space:]]*((([+-]?(\\.[[:digit:]]|[[:digit:]]+(\\.[[:digit:]]*)?))|([[:alnum:]]+)|(\"[^\"]*\")+))[[:space:]]*\\]"
-#define ATTRIBUTE_END "^[[:space:]]*\\]"
+#define ATTRIBUTE_BEGIN R"(^[[:space:]]*\[)"
+#define ATTRIBUTE_NAME R"(^[[:space:]]*(([[:alnum:]])+)[[:space:]]*=)"
+#define ATTRIBUTE_VALUE_NEXT R"(^[[:space:]]*((([+-]?(\.[[:digit:]]|[[:digit:]]+(\.[[:digit:]]*)?))|([[:alnum:]])+|(\".*\")+))[[:space:]]*,)"
+#define ATTRIBUTE_VALUE_END R"(^[[:space:]]*((([+-]?(\.[[:digit:]]|[[:digit:]]+(\.[[:digit:]]*)?))|([[:alnum:]]+)|(\"[^\"]*\")+))[[:space:]]*\])"
+#define ATTRIBUTE_END R"(^[[:space:]]*\])"
 
 namespace dot {
   
   using namespace std;
 
-  // the following is a shortcut for writing data on cout
+  // show a void line if and only if verbose is true
+  void show_void (const string& line, bool verbose)
+  {
+    if (verbose)
+      cout << " [" << line << "]" << endl;
+  }
+
+  // the following is a shortcut for writing data on cout if and only if verbose is true
   template<class T> void show_value (const string& line, const T& value, bool verbose)
   {
     if (verbose)
-      cout << " [" << line << " <" << value << ">]" << endl;
+      cout << " [" << line << " " << value << "]" << endl;
   }
 } // namespace dot
 

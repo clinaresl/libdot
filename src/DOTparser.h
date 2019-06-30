@@ -80,7 +80,7 @@ namespace dot {
 
     // return in contents all the contents of the dot file stored in _file. It
     // returns true if the operation was successfully performed. Otherwise, it
-    // raises an exception
+    // returns false
     bool _read_file (string& contents) const;
     
     // the following methods parse different types according to the given
@@ -105,57 +105,25 @@ namespace dot {
     // C and C++ comments (as specified in the dot language)
     void _parse_comments (string& contents) const;
 
-    // parse the given contents looking for the graph type. It returns true if
-    // it could find the type and false otherwise. In case the graph type is
-    // successfully determined, it is returned in type.
-    bool _parse_graph_type (string& contents, string& type) const;
+    // parse the given contents and if the specified regexp matches then its value
+    // is returned. Additionally, it is shown prefixed by a label on the standard
+    // output if and only if verbose is enabled
+    bool _read_string (string& contents, const string& regexp, string& value, const string& label) const;
 
-    // parse the given contents looking for the graph name. It returns true if
-    // it could find the graph name and false otherwise.  In case the graph name
-    // is successfully determined, it is returned in name.
-    bool _parse_graph_name (string& contents, string& name) const;
-
-    // parse the given contents looking for the beginning of a block. It returns
-    // true if it is found and false otherwise.
-    bool _parse_block_begin (string& contents) const;
-
-    // parse the given contents looking for an assignment to a label id. It
-    // returns true if it is found and false otherwise. In case a label id is
-    // successfully determined, it is returned in name.
-    bool _parse_label_id (string& contents, string& name) const;
+    // parse the given contents and return true if the given regexp
+    // matches. Additionally, it shows the given label if and only if verbose is
+    // enabled
+    bool _read_void (string& contents, const string& regexp, const string& label) const;
     
-    // parse the given contents looking for a value to assign to a label. It
-    // returns true if it is found and false otherwise. In case a value is
-    // successfully determined, it is returned in value.
-    bool _parse_label_value (string& contents, string& value) const;
-  
-    // parse the given contents looking for the name of a vertex. It returns
-    // true if it is found and false otherwise.  In case the vertex name is
-    // successfully determined, it is returned in name.
-    bool _parse_vertex_name (string& contents, string& name) const;
-
-    // parse the given contents looking for the type of an edge.  It returns
-    // true if it is found and false otherwise.  In case the edge type is
-    // successfully determined, it is returned in edge_type.
-    bool _parse_edge_type (string& contents, string& edge_type) const;
-
-    // parse the given contents looking for the name of a target vertex. It then
-    // uses the name of the origin vertex and the type of the edge type (that
-    // should have been previously processed) to update the adjacency map
-    // describing the graph. It returns true if a target could be successfully
-    // processed, and false otherwise.
-    bool _parse_target_name (string& contents, string& name,
-			     string orig_name, string edge_type);
-
     // parse an attributes section. The attributes read are return as a map that
     // stores for every attribute its value as a string. It returns true if any
-    // attributes were found and false otherwise.
-    bool _parse_attributes (string& contents, map<string, string>& dict) const;
+    // attributes were found and raises an exception otherwise
+    bool _process_attributes (string& contents, map<string, string>& dict) const;
 
     // process the value of a label named labelid. This method should be invoked
     // only when a label identifier has been found in contents which should then
     // start with the value of the label. It returns true if it could
-    // successfully determine the label value and false otherwise.
+    // successfully determine the label value and raises an exception otherwise
     bool _process_label_value (string& contents, const string& labelid);
 
     // process the attributes of an edge joining two single vertices, orig_name
@@ -170,17 +138,14 @@ namespace dot {
     // right at the beginning of the specified contents. The original vertex,
     // type of edge and any edge attributes specified previously should be given
     // now in orig_name, edge_type and arcdict. It returns true if and only if
-    // the block could be successfully parsed and false otherwise.
+    // the block could be successfully parsed and raises an exception otherwise
     bool _process_multiple_vertices (string& contents, const string& orig_name,
 				     const string& edge_type, map<string, string>& arcdict);
 
     // process a trajectory or path defined over single definitions of vertices
     // from the origin vertex specified. It returns true upon successful
-    // completion of the trajectory and false otherwise
+    // completion of the trajectory and raises an exception otherwise
     bool _process_trajectory (string& contents, string& orig_name);
-    
-    // show a void line
-    void _show_void (const string& line, bool verbose) const;
     
   public:
 
@@ -240,7 +205,8 @@ namespace dot {
     { _verbose = value; }
     
     // parse the file given in the construction of this instance. It returns
-    // true if the file could be successfully parse and false otherwise.
+    // true if the file could be successfully parse. Otherwise, it raises an
+    // exception with an error message
     bool parse ();    
     
   };  // class parser

@@ -23,7 +23,7 @@
 
 // return in contents all the contents of the dot file stored in _file. It
 // returns true if the operation was successfully performed. Otherwise, it
-// raises an exception
+// returns false
 //
 // the following is deemed as the fastes C++ way for reading the entire contents
 // of a file into a single string. Others might prefer buffer iterators but that
@@ -43,8 +43,8 @@ bool dot::parser::_read_file(string& contents) const
     return true;
   }
 
-  // if it was not possible to open the input stream, then throw an error
-  throw invalid_argument (" It was not possible to read the contents of the dot file: " + _filename);
+  // if it was not possible to open the input stream, then return false
+  return false;
 }
 
 // the following methods parse different types according to the given
@@ -105,131 +105,36 @@ void dot::parser::_parse_comments (string& contents) const
   while (_parse_void (contents, CPP_COMMENT));
 }
 
-// parse the given contents looking for the graph type. It returns true if
-// it could find the type and false otherwise. In case the graph type is
-// successfully determined, it is returned in type.
-bool dot::parser::_parse_graph_type (string& contents, string& type) const
+// parse the given contents and if the specified regexp matches then its value
+// is returned. Additionally, it is shown prefixed by a label on the standard
+// output if and only if verbose is enabled
+bool dot::parser::_read_string (string& contents, const string& regexp, string& value, const string& label) const
 {
   _parse_comments (contents);
-  if (_parse_string (contents, GRAPH_TYPE, type))
-    show_value ("TYPE", type, _verbose);
-  else {
-    cerr << " Syntax error: GRAPH type could not be parsed!" << endl;
-    if (!_verbose)
-      cerr << " try --verbose to obtain additional information" << endl;
-    return false;
-  }
-  return true;
-}
-
-// parse the given contents looking for the graph name. It returns true if
-// it could find the graph name and false otherwise.  In case the graph name
-// is successfully determined, it is returned in name.
-bool dot::parser::_parse_graph_name (string& contents, string& name) const
-{
-  _parse_comments (contents);
-  if (_parse_string (contents, GRAPH_NAME, name))
-    show_value ("NAME", name, _verbose);
-  else {
-    cerr << " Syntax error: NAME could not be parsed!" << endl;
-    if (!_verbose)
-      cerr << " try --verbose to obtain additional information" << endl;
-    return false;
-  }
-  return true;
-}
-
-// parse the given contents looking for the beginning of a block. It returns
-// true if it is found and false otherwise.
-bool dot::parser::_parse_block_begin (string& contents) const
-{
-  _parse_comments (contents);
-  if (_parse_void (contents, BLOCK_BEGIN))
-    _show_void ("--- Block begin found ---", _verbose);
-  else {
-    cerr << " Syntax error: BEGIN OF BLOCK missing" << endl;
-    if (!_verbose)
-      cerr << " try --verbose to obtain additional information" << endl;
-    return false;
-  }
-  return true;
-}
-
-// parse the given contents looking for an assignment to a label id. It
-// returns true if it is found and false otherwise. In case a label id is
-// successfully determined, it is returned in name.
-bool dot::parser::_parse_label_id (string& contents, string& name) const
-{
-  _parse_comments (contents);
-  if (_parse_string (contents, LABEL_ASSIGNMENT, name))
-    show_value ("LABEL ID", name, _verbose);
-  else
-    return false;
-  return true;
-}
-    
-// parse the given contents looking for a value to assign to a label. It returns
-// true if it is found and false otherwise. In case a value is successfully
-// determined, it is returned in value.
-bool dot::parser::_parse_label_value (string& contents, string& value) const
-{
-  _parse_comments (contents);
-  if (_parse_string (contents, LABEL_VALUE, value))
-    show_value ("LABEL VALUE", value, _verbose);
-  else
-    return false;
-  return true;
-}
-    
-// parse the given contents looking for the name of a vertex. It returns
-// true if it is found and false otherwise.  In case the vertex name is
-// successfully determined, it is returned in name.
-bool dot::parser::_parse_vertex_name (string& contents, string& name) const
-{
-  _parse_comments (contents);
-  if (_parse_string (contents, VERTEX_NAME, name))
-    show_value ("VERTEX NAME", name, _verbose);
-  else
-    return false;
-  return true;
-}
-
-// parse the given contents looking for the type of an edge.  It returns
-// true if it is found and false otherwise.  In case the edge type is
-// successfully determined, it is returned in edge_type.
-bool dot::parser::_parse_edge_type (string& contents, string& edge_type) const
-{
-  _parse_comments (contents);
-  if (_parse_string (contents, EDGE_TYPE, edge_type))
-    show_value ("EDGE TYPE", edge_type, _verbose);
+  if (_parse_string (contents, regexp, value))
+    show_value (label, value, _verbose);
   else 
     return false;
   return true;
-}
+}  
 
-// parse the given contents looking for the name of a target vertex. It then
-// uses the name of the origin vertex and the type of the edge type (that should
-// have been previously processed) to update the adjacency map describing the
-// graph. It returns true if a target could be successfully processed, and false
-// otherwise.
-bool dot::parser::_parse_target_name (string& contents, string& name,
-				      string orig_name, string edge_type)
+// parse the given contents and return true if the given regexp
+// matches. Additionally, it shows the given label if and only if verbose is
+// enabled
+bool dot::parser::_read_void (string& contents, const string& regexp, const string& label) const
 {
   _parse_comments (contents);
-  if (_parse_string (contents, VERTEX_NAME, name)) {
-    show_value ("TARGET NAME", name, _verbose);
-    _graph[orig_name].push_back (name);
-    if (edge_type!="->")
-      _graph[name].push_back (orig_name);
-    return true;
-  }
-  return false;
+  if (_parse_void (contents, regexp))
+    show_void (label, _verbose);
+  else
+    return false;
+  return true;
 }
 
 // parse an attributes section. The attributes read are return as a map that
 // stores for every attribute its value as a string. It returns true if any
-// attributes were found and false otherwise.
-bool dot::parser::_parse_attributes (string& contents, map<string, string>& dict) const
+// attributes were found and raises an exception otherwise
+bool dot::parser::_process_attributes (string& contents, map<string, string>& dict) const
 {
   // check if the current contents start with an attributes section
   if (_parse_void (contents, ATTRIBUTE_BEGIN)) {
@@ -241,9 +146,10 @@ bool dot::parser::_parse_attributes (string& contents, map<string, string>& dict
 	
       // yeah, an attributes section is started, so process it. Start getting
       // the name of the next attribute
-      if (_parse_string (contents, ATTRIBUTE_NAME, attrname)) {
+      if (_parse_string (contents, ATTRIBUTE_NAME, attrname)) 
 	show_value ("\tATTRIBUTE", attrname, _verbose);
-      }
+      else 
+	throw invalid_argument ("Syntax error: an ATTRIBUTE_NAME could not be parsed");
 
       // try first to read the value of this attribute followed by and end
       // of attribute section (']')
@@ -264,12 +170,8 @@ bool dot::parser::_parse_attributes (string& contents, map<string, string>& dict
 
       // if neither the attribute section is finished nor it is continued with
       // other assignments, then an error should be raise
-      else {
-	cerr << " Syntax error: ATTRIBUTE section is neither ended nor continued" << endl;
-	if (!_verbose)
-	  cerr << " try --verbose to obtain additional information" << endl;
-	return false;
-      }
+      else 
+	throw invalid_argument ("Syntax error: an ATTRIBUTE_VALUE could not be parsed");
 
       // check anyway if the attributes section gets closed here (this is good,
       // e.g., for preventing empty attributes sections)
@@ -286,18 +188,14 @@ bool dot::parser::_parse_attributes (string& contents, map<string, string>& dict
 
 // process the value of a label named labelid. This method should be invoked
 // only when a label identifier has been found in contents which should then
-// start with the value of the label. It returns true if it could
-// successfully determine the label value and false otherwise.
+// start with the value of the label. It returns true if it could successfully
+// determine the label value and raises an exception otherwise
 bool dot::parser::_process_label_value (string& contents, const string& labelid)
 {
 
   string label_value;
-  if (!_parse_label_value (contents, label_value)) {
-    cerr << " Syntax error: it was not possible to read a LABEL_VALUE" << endl;
-    if (!_verbose)
-      cerr << " try --verbose to obtain additional information" << endl;
-    return false;
-  }
+  if (!_read_string (contents, LABEL_VALUE, label_value, "LABEL VALUE"))
+    throw invalid_argument ("Syntax error: it was not possible to read a LABEL_VALUE");
   
   // if a value could be successfully processed for this label, then store
   // it
@@ -329,7 +227,7 @@ bool dot::parser::_process_single_vertex (string& contents,
 		
   // and process also this vertex attributes, if given
   map<string, string> targetdict;
-  if (_parse_attributes (contents, targetdict))
+  if (_process_attributes (contents, targetdict))
     _vertex [target_name] = targetdict;
 
   return true;
@@ -339,7 +237,7 @@ bool dot::parser::_process_single_vertex (string& contents,
 // at the beginning of the specified contents. The original vertex, type of edge
 // and any edge attributes specified previously should be given now in
 // orig_name, edge_type and arcdict. It returns true if and only if the block
-// could be successfully parsed and false otherwise.
+// could be successfully parsed and raises an exception otherwise
 bool dot::parser::_process_multiple_vertices (string& contents, const string& orig_name,
 					      const string& edge_type, map<string, string>& arcdict)
 {
@@ -349,7 +247,7 @@ bool dot::parser::_process_multiple_vertices (string& contents, const string& or
   // Multiple targets consist of an arbitrarily large list of vertices between
   // curly brackets
   if (_parse_void (contents, BLOCK_BEGIN)) {
-    _show_void (" --- Beginning multiple target specification ---", _verbose);
+    show_void (" --- Beginning multiple target specification ---", _verbose);
     bool eomts = false;           // end of multiple target specification
     while (!eomts) {
 
@@ -358,34 +256,31 @@ bool dot::parser::_process_multiple_vertices (string& contents, const string& or
       if (!(eomts=_parse_void (contents, BLOCK_END))) {
 
 	// get the next vertex name
-	if (!_parse_target_name (contents, target_name, orig_name, edge_type)) {
-	  cerr << " Syntax error: TARGET_NAME could not be parsed" << endl;
-	  if (!_verbose)
-	    cerr << " try --verbose to obtain additional information" << endl;
-	  return false;
-	}
-	else
+	if (!_read_string (contents, VERTEX_NAME, target_name, "TARGET VERTEX"))
+	  throw invalid_argument ("Syntax error: TARGET_NAME could not be parsed");
+	else {
 
+	  _graph[orig_name].push_back (target_name);
+	  if (edge_type!="->")
+	    _graph[target_name].push_back (orig_name);
+    
 	  // process now the edge attributes given to this vertex and, if given,
 	  // the attributes of the target vertex as well
 	  _process_single_vertex (contents, orig_name, edge_type, target_name, arcdict);
+	}
       }
     }
-    _show_void (" --- Ending multiple target specification ---", _verbose);
+    show_void (" --- Ending multiple target specification ---", _verbose);
   }
-  else {
-    cerr << " Syntax error: TARGET_NAME could not be parsed" << endl;
-    if (!_verbose)
-      cerr << " try --verbose to obtain additional information" << endl;
-    return false;
-  }
+  else
+    throw invalid_argument ("Syntax error: TARGET_NAME could not be parsed");
 
   return true;
 }
 
 // process a trajectory or path defined over single definitions of vertices
 // from the origin vertex specified. It returns true upon successful
-// completion of the trajectory and false otherwise
+// completion of the trajectory and raises an exception otherwise
 bool dot::parser::_process_trajectory (string& contents, string& orig_name)
 {
 
@@ -393,38 +288,31 @@ bool dot::parser::_process_trajectory (string& contents, string& orig_name)
   string target_name;
   
   // while an edge is found in contents
-  while (_parse_edge_type (contents, edge_type)) {
+  while (_read_string (contents, EDGE_TYPE, edge_type, "EDGE TYPE")) {
 
     map<string, string> nestedarcdict;
 	  
     // yeah! A path is listed, so make the target vertex the origin, and
     // parse the attributes of this edge if any were given
     orig_name = target_name;
-    _parse_attributes (contents, nestedarcdict);
+    _process_attributes (contents, nestedarcdict);
 
     // get the target vertex of this specific edge
-    if (!_parse_target_name (contents, target_name, orig_name, edge_type)) {
+    if (!_read_string (contents, VERTEX_NAME, target_name, "TARGET VERTEX"))
+      throw invalid_argument ("Syntax error: a VERTEX_NAME could not be found while parsing a path");
+    else {
 
-      cerr << " Syntax error: a VERTEX_NAME could not be found while parsing a path" << endl;
-      if (!_verbose)
-	cerr << " try --verbose to obtain additional information" << endl;
-      return false;
-    }
-    else
-
+      _graph[orig_name].push_back (target_name);
+      if (edge_type!="->")
+	_graph[target_name].push_back (orig_name);
+      
       // and update all the edge attributes of this edge and also the attributes
       // of the target vertex if any were given
       _process_single_vertex (contents, orig_name, edge_type, target_name, nestedarcdict);
+    }
   }
 
   return true;
-}
-
-// show a void line
-void dot::parser::_show_void (const string& line, bool verbose) const
-{
-  if (verbose)
-    cout << " [" << line << "]" << endl;
 }
 
 // Public services
@@ -590,7 +478,8 @@ std::string dot::parser::get_edge_attribute (const string& origin,
 }
 
 // parse the file given in the construction of this instance. It returns true if
-// the file could be successfully parse and false otherwise.
+// the file could be successfully parse. Otherwise, it raises an exception with
+// an error message
 bool dot::parser::parse ()
 {
   bool eob = false;                                             // end of block
@@ -598,23 +487,25 @@ bool dot::parser::parse ()
   // -- read the file
   string contents;
   if (!_read_file (contents))
-    return false;
+    throw invalid_argument ("It was not possible to read the contents of the dot file: " + _filename);
 
   // -- parse the file
 
-  // get the graph type and its ID (which is optional)
+  // get the graph type
   // REMARK - "strict" is not acknowledged!
-  if (!_parse_graph_type (contents, _type))
-    return false;
+  string type;
+  if (!_read_string (contents, GRAPH_TYPE, type, "TYPE"))
+    throw invalid_argument ("Syntax error: GRAPH type could not be parsed");
   
   // get the graph name
   // REMARK - the graph name is entirely optional
-  if (!_parse_graph_name (contents, _name))
-    return false;
+  string name;
+  if (!_read_string (contents, GRAPH_NAME, name, "NAME"))
+    throw invalid_argument ("Syntax error: NAME could not be parsed");
   
   // block start
-  if (!_parse_block_begin (contents))
-    return false;
+  if (!_read_void (contents, BLOCK_BEGIN, "--- Block begin found ---"))
+    throw invalid_argument ("Syntax error: BEGIN OF BLOCK missing");
   
   // now, process all edges of the graph
   while (!eob) {
@@ -626,7 +517,7 @@ bool dot::parser::parse ()
       // at the beginning of each line we could have either a vertex name, or a
       // label. Try first, reading a label
       string orig_name;
-      if (_parse_label_id (contents, orig_name)) {
+      if (_read_string (contents, LABEL_ASSIGNMENT, orig_name, "LABEL ID")) {
 
 	// if a label was found, then retrieve its value and store it in this
 	// parser
@@ -639,41 +530,40 @@ bool dot::parser::parse ()
 	continue;
       }
       else 
-	if (!_parse_vertex_name (contents, orig_name)) {
-	  cerr << " Syntax error: neither a VERTEX_NAME nor a LABEL_ID have been provided" << endl;
-	  if (!_verbose)
-	    cerr << " try --verbose to obtain additional information" << endl;
-	  return false;
-	}
+	if (!_read_string (contents, VERTEX_NAME, orig_name, "SOURCE_VERTEX"))
+	  throw invalid_argument ("Syntax error: neither a VERTEX_NAME nor a LABEL_ID have been provided");
 
       // and process also its attributes
       map<string, string> origdict;
-      if (_parse_attributes (contents, origdict))
+      if (_process_attributes (contents, origdict))
 	_vertex [orig_name] = origdict;
 
       // now, get the edge type, either directed or undirected
       string edge_type;
-      if (!_parse_edge_type (contents, edge_type)) {
-	cerr << " Syntax error: neither an EDGE_TYPE nor an ASSIGNMENT have been provided" << endl;
-	if (!_verbose)
-	  cerr << " try --verbose to obtain additional information" << endl;
-	return false;
-      }
+      if (!_read_string (contents, EDGE_TYPE, edge_type, "EDGE TYPE"))
+	throw invalid_argument ("Syntax error: no EDGE_TYPE has been provided");
 
-      // and process its attributes
+      // and process its attributes. Note that at this point, the edge
+      // attributes are only parsed and saved. They are written to the private
+      // data members later when invoking either process_single_vertex or
+      // process_multiple_vertices
       map<string, string> arcdict;
-      _parse_attributes (contents, arcdict);
+      _process_attributes (contents, arcdict);      
 
       // the target can be specified in two different forms: either single or
       // multiple. A single target consists uniquely of a single vertex
       string target_name;
-      if (!_parse_target_name (contents, target_name, orig_name, edge_type))
+      if (!_read_string (contents, VERTEX_NAME, target_name, "TARGET VERTEX"))
 	_process_multiple_vertices (contents, orig_name, edge_type, arcdict);
 
       // if the target was given in single form, then process the attributes of
       // the edge from its origin, if given
       else {
-	
+
+	  _graph[orig_name].push_back (target_name);
+	  if (edge_type!="->")
+	    _graph[target_name].push_back (orig_name);
+    
 	// process now the edge attributes given to this vertex and, if given,
 	// the attributes of the target vertex as well
 	_process_single_vertex (contents, orig_name, edge_type, target_name, arcdict);
@@ -691,7 +581,7 @@ bool dot::parser::parse ()
     }
   }
 
-  _show_void (" --- Block end found ---", _verbose);
+  show_void (" --- Block end found ---", _verbose);
   
   return true;                                                 // nicely return
 }
