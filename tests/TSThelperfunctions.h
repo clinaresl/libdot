@@ -71,8 +71,9 @@ bool equalMaps (map<T, vector<T>>& m1, map<T, vector<T>>& m2)
 // INTEGERS
 // ----------------------------------------------------------------------------
 
-// Generate a random number in the interval [-bound, +bound)
-int randInt (int bound);
+// Generate a random number in the interval [-bound, +bound). Note that the
+// result is given as a string
+string randInt (int bound);
 
 // ----------------------------------------------------------------------------
 // STRINGS
@@ -93,28 +94,41 @@ string randQuotedString (int length, std::string exclude="\"");
 // GRAPHS
 // ----------------------------------------------------------------------------
 
-// Generate a string with a dot specification of precisely n either undirected
-// (edge_spec=UNDIRECTED_EDGE), directed (edge_spec=DIRECTED_EDGE) or
-// undirected/directed (edge_spec=MIX_EDGE) edges with neither attributes nor
-// labels defined over n/2 vertices.
+// Generates a vector of n strings, each one with the declaration of a label
+// that might be either an integer, a floating-point number, an unquoted string
+// or a quoted string
 //
-// It returns the textual definition of the edges in the DOT language. The
-// collection of random source vertices and edges are returned in dedicated vars.
-string randEdges (int n, int edge_spec,
-		  vector<string>& vertices, map<string, vector<string>>& edges);
+// It returns the values of all labels in a map whose index is the label name
+// and the value is the label value
+vector<string> randLabels (int n, map<string, string>& labels);
 
-// Generate a random graph with precisely n edges defined over n/2 vertices and
-// no attributes at all named after graph_name. It returns the textual
-// definition of the graph in the DOT language. The collection of random
-// vertices and edges are returned in dedicated output vars.
+// Generate a vector of strings, each one with the declaration of an edge. The
+// number of edges generated is precisely nbedges and they are either undirected
+// (edge_spec=UNDIRECTED_EDGE), directed (edge_spec=DIRECTED_EDGE) or
+// undirected/directed (edge_spec=MIX_EDGE) with neither attributes nor labels.
+//
+// The collection of random source vertices and edges are returned in dedicated
+// vars.
+vector<string> randEdges (int nbedges, int edge_spec,
+			  vector<string>& vertices, map<string, vector<string>>& edges);
+
+// Generate a random graph with precisely nbedges edges defined over nbedges/2
+// vertices, and nblabels labels, and no attributes at all named after
+// graph_name. It returns the textual definition of the graph in the DOT
+// language. The collection of random vertices and edges are returned in
+// dedicated output vars. In addition, the labels and their values are also
+// returned in a dedicated map.
 //
 // The type of the graph is determined by the keyword graph_spec. It is
 // undirected if graph_spec=UNDIRECTED_GRAPH and directed if
 // graph_spec=DIRECTED_GRAPH. The type of edges is determined by edge_spec: they
 // are all undirected if edge_spec=UNDIRECTED_EDGE, directed if
 // edge_spec=DIRECTED_EDGE and a mixture if edge_spec=MIX_EDGE.
-string randGraph (int n, int graph_spec, int edge_spec, const string graph_name,
-		  vector<string>& vertices, map<string, vector<string>>& edges);
+string randGraph (int nbedges, int nblabels,
+		  const string graph_name,
+		  int graph_spec, int edge_spec, 
+		  vector<string>& vertices, map<string, vector<string>>& edges,
+		  map<string, string>& labels);
 
 #endif 	    /* !TSTHELPERFUNCTIONS_H_ */
 

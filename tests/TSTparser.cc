@@ -34,6 +34,139 @@ TEST (Parser, DISABLED_FileNotFound)
   EXPECT_THROW (parser.parse (), invalid_argument);
 }
 
+// Checks that the first example (simple graph) shown in:
+//
+// https://graphs.grevian.org/example
+//
+// is correctly parsed
+TEST (Parser, DISABLED_GrevianExample1)
+{
+  
+  // create a parser and parse the contnets of this file
+  dot::parser parser ("examples/example-1.dot");
+
+  // avoid any messages on the output console by making the verbose level to be
+  // false
+  parser.set_verbose (false);
+  
+  // verify that the file is correctly parsed
+  ASSERT_TRUE (parser.parse ());
+}
+
+// Checks that the second example (K6) shown in:
+//
+// https://graphs.grevian.org/example
+//
+// is correctly parsed
+TEST (Parser, DISABLED_GrevianExample2)
+{
+  
+  // create a parser and parse the contnets of this file
+  dot::parser parser ("examples/example-2.dot");
+
+  // avoid any messages on the output console by making the verbose level to be
+  // false
+  parser.set_verbose (false);
+  
+  // verify that the file is correctly parsed
+  ASSERT_TRUE (parser.parse ());
+}
+
+// Checks that the third example (simple digraph) shown in:
+//
+// https://graphs.grevian.org/example
+//
+// is correctly parsed
+TEST (Parser, DISABLED_GrevianExample3)
+{
+  
+  // create a parser and parse the contnets of this file
+  dot::parser parser ("examples/example-3.dot");
+
+  // avoid any messages on the output console by making the verbose level to be
+  // false
+  parser.set_verbose (false);
+  
+  // verify that the file is correctly parsed
+  ASSERT_TRUE (parser.parse ());
+}
+
+// Checks that the fourth example (full digraph) shown in:
+//
+// https://graphs.grevian.org/example
+//
+// is correctly parsed
+TEST (Parser, DISABLED_GrevianExample4)
+{
+  
+  // create a parser and parse the contnets of this file
+  dot::parser parser ("examples/example-4.dot");
+
+  // avoid any messages on the output console by making the verbose level to be
+  // false
+  parser.set_verbose (false);
+  
+  // verify that the file is correctly parsed
+  ASSERT_TRUE (parser.parse ());
+}
+
+// Checks that the first variant of the fifth example (showing a path) shown in:
+//
+// https://graphs.grevian.org/example
+//
+// is correctly parsed
+TEST (Parser, DISABLED_GrevianExample5a)
+{
+  
+  // create a parser and parse the contnets of this file
+  dot::parser parser ("examples/example-5a.dot");
+
+  // avoid any messages on the output console by making the verbose level to be
+  // false
+  parser.set_verbose (false);
+  
+  // verify that the file is correctly parsed
+  ASSERT_TRUE (parser.parse ());
+}
+
+// Checks that the second variant of the fifth example (showing a path) shown in:
+//
+// https://graphs.grevian.org/example
+//
+// is correctly parsed
+TEST (Parser, DISABLED_GrevianExample5b)
+{
+  
+  // create a parser and parse the contnets of this file
+  dot::parser parser ("examples/example-5b.dot");
+
+  // avoid any messages on the output console by making the verbose level to be
+  // false
+  parser.set_verbose (false);
+  
+  // verify that the file is correctly parsed
+  ASSERT_TRUE (parser.parse ());
+}
+
+// Checks that the seventh example (large graph) shown in:
+//
+// https://graphs.grevian.org/example
+//
+// is correctly parsed
+TEST (Parser, DISABLED_GrevianExample7)
+{
+  
+  // create a parser and parse the contnets of this file
+  dot::parser parser ("examples/example-7.dot");
+
+  // avoid any messages on the output console by making the verbose level to be
+  // false
+  parser.set_verbose (false);
+  
+  // verify that the file is correctly parsed
+  ASSERT_TRUE (parser.parse ());
+}
+
 // Checks that the type of an anonymous graph (either directed or undirected) is
 // correctly retrieved
 // ----------------------------------------------------------------------------
@@ -42,6 +175,7 @@ TEST (Parser, DISABLED_GetTypeAnonymousGraph)
 
   vector<string> vertices;
   map<string, vector<string>> edges;
+  map<string, string> labels;
   
   srand(time(nullptr));  
 
@@ -53,8 +187,8 @@ TEST (Parser, DISABLED_GetTypeAnonymousGraph)
     // -- undirected graphs
     
     // create an undirected anonymous graph randomly
-    string dotgraph {randGraph (10, UNDIRECTED_GRAPH, UNDIRECTED_EDGE, "",
-				vertices, edges)};
+    string dotgraph {randGraph (10, 0, "", UNDIRECTED_GRAPH, UNDIRECTED_EDGE, 
+				vertices, edges, labels)};
 
     // parse the graph
     parser.parse_string (dotgraph);
@@ -65,8 +199,8 @@ TEST (Parser, DISABLED_GetTypeAnonymousGraph)
     // -- directed graphs
     
     // create an undirected anonymous graph randomly
-    dotgraph = randGraph (10, DIRECTED_GRAPH, DIRECTED_EDGE, "",
-			  vertices, edges);
+    dotgraph = randGraph (10, 0, "", DIRECTED_GRAPH, DIRECTED_EDGE,
+			  vertices, edges, labels);
 
     // parse the graph
     parser.parse_string (dotgraph);
@@ -84,6 +218,7 @@ TEST (Parser, DISABLED_GetTypeNamedGraph)
 
   vector<string> vertices;
   map<string, vector<string>> edges;
+  map<string, string> labels;
   
   srand(time(nullptr));  
 
@@ -98,8 +233,8 @@ TEST (Parser, DISABLED_GetTypeNamedGraph)
     // -- undirected graphs
     
     // create an undirected graph randomly with the given name
-    string dotgraph {randGraph (10, UNDIRECTED_GRAPH, UNDIRECTED_EDGE, graphname,
-				vertices, edges)};
+    string dotgraph {randGraph (10, 0, graphname, UNDIRECTED_GRAPH, UNDIRECTED_EDGE, 
+				vertices, edges, labels)};
 
     // parse the graph
     parser.parse_string (dotgraph);
@@ -110,8 +245,8 @@ TEST (Parser, DISABLED_GetTypeNamedGraph)
     // -- directed graphs
     
     // create a directed graph randomly with the given name
-    dotgraph = randGraph (10, DIRECTED_GRAPH, DIRECTED_EDGE, graphname,
-			  vertices, edges);
+    dotgraph = randGraph (10, 0, graphname, DIRECTED_GRAPH, DIRECTED_EDGE, 
+			  vertices, edges, labels);
 
     // parse the graph
     parser.parse_string (dotgraph);
@@ -129,6 +264,7 @@ TEST (Parser, DISABLED_GetNameAnonymousGraph)
 
   vector<string> vertices;
   map<string, vector<string>> edges;
+  map<string, string> labels;
   
   srand(time(nullptr));  
 
@@ -140,8 +276,8 @@ TEST (Parser, DISABLED_GetNameAnonymousGraph)
     // -- undirected graphs
     
     // create an anonymous undirected graph randomly
-    string dotgraph {randGraph (10, UNDIRECTED_GRAPH, UNDIRECTED_EDGE, "",
-				vertices, edges)};
+    string dotgraph {randGraph (10, 0, "", UNDIRECTED_GRAPH, UNDIRECTED_EDGE, 
+				vertices, edges, labels)};
 
     // parse the graph
     parser.parse_string (dotgraph);
@@ -152,8 +288,8 @@ TEST (Parser, DISABLED_GetNameAnonymousGraph)
     // -- directed graphs
     
     // create an anonymous directed graph randomly
-    dotgraph = randGraph (10, DIRECTED_GRAPH, DIRECTED_EDGE, "",
-			  vertices, edges);
+    dotgraph = randGraph (10, 0, "", DIRECTED_GRAPH, DIRECTED_EDGE,
+			  vertices, edges, labels);
 
     // parse the graph
     parser.parse_string (dotgraph);
@@ -171,7 +307,8 @@ TEST (Parser, DISABLED_GetNameNamedGraph)
 
   vector<string> vertices;
   map<string, vector<string>> edges;
-  
+  map<string, string> labels;
+
   srand(time(nullptr));  
 
   for (auto i = 0 ; i < NB_TESTS ; i++) {
@@ -185,8 +322,8 @@ TEST (Parser, DISABLED_GetNameNamedGraph)
     // -- undirected graphs
     
     // create an undirected graph randomly with the given name
-    string dotgraph {randGraph (10, UNDIRECTED_GRAPH, UNDIRECTED_EDGE, graphname,
-				vertices, edges)};
+    string dotgraph {randGraph (10, 0, graphname, UNDIRECTED_GRAPH, UNDIRECTED_EDGE,
+				vertices, edges, labels)};
 
     // parse the graph
     parser.parse_string (dotgraph);
@@ -197,8 +334,8 @@ TEST (Parser, DISABLED_GetNameNamedGraph)
     // -- directed graphs
     
     // create a directed graph randomly with the given name
-    dotgraph = randGraph (10, DIRECTED_GRAPH, DIRECTED_EDGE, graphname,
-			  vertices, edges);
+    dotgraph = randGraph (10, 0, graphname, DIRECTED_GRAPH, DIRECTED_EDGE, 
+			  vertices, edges, labels);
 
     // parse the graph
     parser.parse_string (dotgraph);
@@ -217,6 +354,7 @@ TEST (Parser, DISABLED_GetVerticesPlainNamedGraph)
 
   vector<string> vertices;
   map<string, vector<string>> edges;
+  map<string, string> labels;
   
   srand(time(nullptr));  
 
@@ -231,8 +369,8 @@ TEST (Parser, DISABLED_GetVerticesPlainNamedGraph)
     // -- undirected graphs
     
     // create an undirected graph randomly with the given name
-    string dotgraph {randGraph (10, UNDIRECTED_GRAPH, UNDIRECTED_EDGE, graphname,
-				vertices, edges)};
+    string dotgraph {randGraph (10, 0, graphname, UNDIRECTED_GRAPH, UNDIRECTED_EDGE, 
+				vertices, edges, labels)};
 
     // parse the graph
     parser.parse_string (dotgraph);
@@ -245,8 +383,8 @@ TEST (Parser, DISABLED_GetVerticesPlainNamedGraph)
     // -- directed graphs
     
     // create an undirected graph randomly with the given name
-    dotgraph = randGraph (10, DIRECTED_GRAPH, DIRECTED_EDGE, graphname,
-			  vertices, edges);
+    dotgraph = randGraph (10, 0, graphname, DIRECTED_GRAPH, DIRECTED_EDGE,
+			  vertices, edges, labels);
 
     // parse the graph
     dot::parser diparser;
@@ -268,6 +406,7 @@ TEST (Parser, DISABLED_GetEdgesPlainNamedGraph)
 
   vector<string> vertices;
   map<string, vector<string>> edges;
+  map<string, string> labels;
   
   srand(time(nullptr));  
 
@@ -282,8 +421,8 @@ TEST (Parser, DISABLED_GetEdgesPlainNamedGraph)
     // -- undirected graphs
     
     // create an undirected graph randomly with the given name
-    string dotgraph {randGraph (10, UNDIRECTED_GRAPH, UNDIRECTED_EDGE, graphname,
-				vertices, edges)};
+    string dotgraph {randGraph (10, 0, graphname, UNDIRECTED_GRAPH, UNDIRECTED_EDGE,
+				vertices, edges, labels)};
 
     // parse the graph
     parser.parse_string (dotgraph);
@@ -296,8 +435,8 @@ TEST (Parser, DISABLED_GetEdgesPlainNamedGraph)
     // -- directed graphs
     
     // create an undirected graph randomly with the given name
-    dotgraph = randGraph (10, DIRECTED_GRAPH, DIRECTED_EDGE, graphname,
-			  vertices, edges);
+    dotgraph = randGraph (10, 0, graphname, DIRECTED_GRAPH, DIRECTED_EDGE, 
+			  vertices, edges, labels);
 
     // parse the graph
     dot::parser diparser;
@@ -309,6 +448,57 @@ TEST (Parser, DISABLED_GetEdgesPlainNamedGraph)
     ASSERT_TRUE (equalMaps<string> (edges, dotedges)) << dotgraph << endl;
   }
 }
+
+// Checks that labels (integer, floating-point, identifiers and quoted strings)
+// are properly parsed in graphs with both directed and undirected edges. In
+// passing, it also verifies that the list of vertices and edges are properly
+// processed.
+// ----------------------------------------------------------------------------
+TEST (Parser, DISABLED_GetLabels)
+{
+
+  srand(time(nullptr));  
+
+  for (auto i = 0 ; i < NB_TESTS ; i++) {
+
+    vector<string> vertices;
+    map<string, vector<string>> edges;
+    map<string, string> labels;
+
+    // -- undirected graphs
+    
+    // generate a random graph
+    string dotgraph = randGraph (10, 10, randString (10), DIRECTED_GRAPH, MIX_EDGE,
+				 vertices, edges, labels);
+
+    // create a dot parser and parse the dot graph
+    dot::parser parser;
+    parser.parse_string (dotgraph);
+
+    // get all defined labels from the parser
+    vector<string> dotlabels = parser.get_labels ();
+    
+    // now, browse all the labels randomly generated and ensure they have been
+    // correctly retrieved by the parser
+    for (auto label : labels) {
+
+      // make sure this label has been recognized by the parser
+      ASSERT_TRUE (find (dotlabels.begin (), dotlabels.end (), label.first) != dotlabels.end ()) << dotgraph << endl;
+
+      // ensure also that both have the same value for this label
+      ASSERT_EQ (parser.get_label_value (label.first), label.second) << dotgraph << endl;
+    }
+
+    // In passing, verify also that the list of vertices is properly parsed
+    vector<string> dotvertices = parser.get_vertices ();
+    ASSERT_TRUE (equalVectors<string> (vertices, dotvertices)) << dotgraph << endl;
+
+    // and also the list of edges
+    map<string, vector<string>> dotedges = parser.get_graph ();
+    ASSERT_TRUE (equalMaps<string> (edges, dotedges)) << dotgraph << endl;    
+  }
+}
+
 
 // // Checks that 
 // // ----------------------------------------------------------------------------

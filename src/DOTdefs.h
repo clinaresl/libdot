@@ -33,7 +33,7 @@
 #define BLOCK_BEGIN R"(^[[:space:]]*\{)"
 #define BLOCK_END R"(^[[:space:]]*})"
 #define LABEL_ASSIGNMENT R"(^[[:space:]]*(([0-9a-zA-Z_]+))[[:space:]]*=)"
-#define LABEL_VALUE R"(^[[:space:]]*((([+-]?(\.[[:digit:]]|[[:digit:]]+(\.[[:digit:]]*)?))|([0-9a-zA-Z_]+)|(\".*\")+))[[:space:]]*)"
+#define LABEL_VALUE R"(^[[:space:]]*((([+-]?(\.[[:digit:]]|[[:digit:]]+(\.[[:digit:]]*)?))|([a-zA-Z_][0-9a-zA-Z_]+)|(\".*\")+))[[:space:]]*)"
 #define VERTEX_NAME R"(^[[:space:]]*([0-9a-zA-Z_]+))"
 #define EDGE_TYPE R"(^[[:space:]]*(--|->))"
 #define END_OF_STATEMENT R"(^[[:space:]]*;)"
