@@ -98,9 +98,9 @@ namespace dot {
     
   private:
 
-    // return in contents all the contents of the dot file stored in _file. It
-    // returns true if the operation was successfully performed. Otherwise, it
-    // returns false
+    // return in contents all the contents of the dot file stored in
+    // _filename. It returns true if the operation was successfully
+    // performed. Otherwise, it returns false
     bool _read_file (string& contents) const;
     
     // the following methods parse different types according to the given
@@ -169,8 +169,11 @@ namespace dot {
     
   public:
 
-    // Default constructor are forbidden
-    parser () = delete;
+    // Default constructor 
+    parser ()
+      : _filename {""},
+	_verbose  {false}
+    {}
     
     // Explicit constructor
     parser (const string& filename)
@@ -189,8 +192,12 @@ namespace dot {
     // get the value of the label with the specified name
     string get_label_value (const string& name);
     
-    // get all vertices of the graph
+    // get all source vertices of the graph
     vector<string> get_vertices () const;
+
+    // return the graph parsed as a map where the index is a source vertex and
+    // the value is a vector of target vertices.
+    map<string, vector<string>> get_graph () const;
     
     // get all nodes that are reachable from a given node. In case no node is
     // found with the given node an exception is raised.
@@ -216,18 +223,18 @@ namespace dot {
     // found in the edge joining those two vertices, an exception is raised.
     string get_edge_attribute (const string& origin, const string& target, const string& attr);
 
-    // set the filename to parse
-    void set_filename (string filename)
-    { _filename = filename; }
-    
     // Sets the verbose level to true by default
     void set_verbose (bool value = true)
     { _verbose = value; }
     
-    // parse the file given in the construction of this instance. It returns
-    // true if the file could be successfully parse. Otherwise, it raises an
-    // exception with an error message
+    // parse the file given in the explicit constructor of this instance. It
+    // returns true if the file could be successfully parse. Otherwise, it
+    // raises an exception with an error message
     bool parse ();    
+    
+    // parse the given string. It returns true if the string could be successfully
+    // parse. Otherwise, it raises an exception with an error message
+    bool parse_string (string contents);    
     
   };  // class parser
   

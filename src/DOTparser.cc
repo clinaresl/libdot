@@ -21,7 +21,7 @@
 // Private services
 // ----------------------------------------------------------------------------
 
-// return in contents all the contents of the dot file stored in _file. It
+// return in contents all the contents of the dot file stored in _filename. It
 // returns true if the operation was successfully performed. Otherwise, it
 // returns false
 //
@@ -342,7 +342,7 @@ std::string dot::parser::get_label_value (const string& name)
   return _label[name];
 }
     
-// get all vertices of the graph
+// get all source vertices of the graph
 std::vector<std::string> dot::parser::get_vertices () const
 {
   vector<string> vertices;
@@ -352,6 +352,13 @@ std::vector<std::string> dot::parser::get_vertices () const
     vertices.push_back (ivertex.first);
 
   return vertices;
+}
+
+// return the graph parsed as a map where the index is a source vertex and
+// the value is a vector of target vertices.
+std::map<std::string, std::vector<std::string>> dot::parser::get_graph () const
+{
+  return _graph;
 }
 
 // get all nodes that are reachable from a given node. In case no node is
@@ -477,30 +484,19 @@ std::string dot::parser::get_edge_attribute (const string& origin,
   return _edge[origin][target][attr];
 }
 
-// parse the file given in the construction of this instance. It returns true if
-// the file could be successfully parse. Otherwise, it raises an exception with
-// an error message
-bool dot::parser::parse ()
+// parse the given string. It returns true if the string could be successfully
+// parse. Otherwise, it raises an exception with an error message
+bool dot::parser::parse_string (string contents)
 {
-  bool eob = false;                                             // end of block
-  
-  // -- read the file
-  string contents;
-  if (!_read_file (contents))
-    throw invalid_argument ("It was not possible to read the contents of the dot file: " + _filename);
-
-  // -- parse the file
 
   // get the graph type
   // REMARK - "strict" is not acknowledged!
-  string type;
-  if (!_read_string (contents, GRAPH_TYPE, type, "TYPE"))
+  if (!_read_string (contents, GRAPH_TYPE, _type, "TYPE"))
     throw dot::syntax_error ("GRAPH type could not be parsed");
   
   // get the graph name
   // REMARK - the graph name is entirely optional
-  string name;
-  if (!_read_string (contents, GRAPH_NAME, name, "NAME"))
+  if (!_read_string (contents, GRAPH_NAME, _name, "NAME"))
     throw dot::syntax_error ("NAME could not be parsed");
   
   // block start
@@ -508,6 +504,7 @@ bool dot::parser::parse ()
     throw dot::syntax_error ("BEGIN OF BLOCK missing");
   
   // now, process all edges of the graph
+  bool eob = false;                                             // end of block
   while (!eob) {
 
     // unless we are closing the block at this point
@@ -594,6 +591,22 @@ bool dot::parser::parse ()
   
   return true;                                                 // nicely return
 }
+
+// parse the file given in the explicit constructor of this instance. It returns
+// true if the file could be successfully parse. Otherwise, it raises an
+// exception with an error message
+bool dot::parser::parse ()
+{
+  
+  // read the file
+  string contents;
+  if (!_read_file (contents))
+    throw invalid_argument ("It was not possible to read the contents of the dot file: " + _filename);
+
+  // and now parse its contents
+  return parse_string (contents);
+}
+
 
 
 

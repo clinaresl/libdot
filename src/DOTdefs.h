@@ -29,20 +29,20 @@
 
 // Specification part
 #define GRAPH_TYPE R"(^[[:space:]]*(digraph|graph))"
-#define GRAPH_NAME R"(^[[:space:]]*([\-0-9a-zA-Z_]*))"
+#define GRAPH_NAME R"(^[[:space:]]*([0-9a-zA-Z_]*))"
 #define BLOCK_BEGIN R"(^[[:space:]]*\{)"
 #define BLOCK_END R"(^[[:space:]]*})"
-#define LABEL_ASSIGNMENT R"(^[[:space:]]*(([[:alnum:]])+)[[:space:]]*=)"
-#define LABEL_VALUE R"(^[[:space:]]*((([+-]?(\.[[:digit:]]|[[:digit:]]+(\.[[:digit:]]*)?))|([[:alnum:]])+|(\".*\")+))[[:space:]]*)"
-#define VERTEX_NAME R"(^[[:space:]]*([[:alnum:]]+))"
+#define LABEL_ASSIGNMENT R"(^[[:space:]]*(([0-9a-zA-Z_]+))[[:space:]]*=)"
+#define LABEL_VALUE R"(^[[:space:]]*((([+-]?(\.[[:digit:]]|[[:digit:]]+(\.[[:digit:]]*)?))|([0-9a-zA-Z_]+)|(\".*\")+))[[:space:]]*)"
+#define VERTEX_NAME R"(^[[:space:]]*([0-9a-zA-Z_]+))"
 #define EDGE_TYPE R"(^[[:space:]]*(--|->))"
 #define END_OF_STATEMENT R"(^[[:space:]]*;)"
 #define CPP_COMMENT R"(^[[:space:]]*//.*\n)"
 
 #define ATTRIBUTE_BEGIN R"(^[[:space:]]*\[)"
-#define ATTRIBUTE_NAME R"(^[[:space:]]*(([[:alnum:]])+)[[:space:]]*=)"
-#define ATTRIBUTE_VALUE_NEXT R"(^[[:space:]]*((([+-]?(\.[[:digit:]]|[[:digit:]]+(\.[[:digit:]]*)?))|([[:alnum:]])+|(\".*\")+))[[:space:]]*,)"
-#define ATTRIBUTE_VALUE_END R"(^[[:space:]]*((([+-]?(\.[[:digit:]]|[[:digit:]]+(\.[[:digit:]]*)?))|([[:alnum:]]+)|(\"[^\"]*\")+))[[:space:]]*\])"
+#define ATTRIBUTE_NAME R"(^[[:space:]]*(([0-9a-zA-Z_]+))[[:space:]]*=)"
+#define ATTRIBUTE_VALUE_NEXT R"(^[[:space:]]*((([+-]?(\.[[:digit:]]|[[:digit:]]+(\.[[:digit:]]*)?))|([0-9a-zA-Z_]+)|(\".*\")+))[[:space:]]*,)"
+#define ATTRIBUTE_VALUE_END R"(^[[:space:]]*((([+-]?(\.[[:digit:]]|[[:digit:]]+(\.[[:digit:]]*)?))|([0-9a-zA-Z_]+)|(\"[^\"]*\")+))[[:space:]]*\])"
 #define ATTRIBUTE_END R"(^[[:space:]]*\])"
 
 namespace dot {
@@ -50,7 +50,7 @@ namespace dot {
   using namespace std;
 
   // show a void line if and only if verbose is true
-  void show_void (const string& line, bool verbose)
+  static void show_void (const string& line, bool verbose)
   {
     if (verbose)
       cout << " [" << line << "]" << endl;

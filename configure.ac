@@ -13,10 +13,14 @@ m4_pattern_allow([AM_PROG_AR])
 AM_PROG_AR
 AC_CONFIG_MACRO_DIR([m4])
 AC_PROG_CXX
-LT_INIT([disable-static])
+
+# verify that Google Test is installed in the system
+PKG_CHECK_MODULES([GTEST], [gtest_main])
 
 # newer versions of automake expect a definition for AR
 m4_ifdef([AM_PROG_AR], [AM_PROG_AR])
+
+LT_INIT([disable-static])
 
 # Define these substitions here to keep all version information in one place.
 # For information on how to properly maintain the library version information,

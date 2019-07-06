@@ -1,0 +1,125 @@
+/* 
+  TSThelperfunctions.h
+  Description: Generic helpers for the Unit Test Cases only
+  Started on  <Tue Mar 26 10:56:22 2019>
+  ----------------------------------------------------------------------------- 
+  Made by Carlos Linares López
+  Login   <carlos.linares@uc3m.es>
+*/
+
+#ifndef   	TSTHELPERFUNCTIONS_H_
+# define   	TSTHELPERFUNCTIONS_H_
+
+#include <algorithm>
+#include <cstdlib>
+#include <ctime>
+#include <iostream> 
+#include <map>
+#include <set>
+#include <vector>
+
+using namespace std; 
+
+// ----------------------------------------------------------------------------
+// TESTS
+// ----------------------------------------------------------------------------
+
+// Verify that two vectors contain precisely the same items
+template<class T>
+bool equalVectors (vector<T>& v1, vector<T>& v2)
+{
+
+  // if sizes differ then exit immediately
+  if (v1.size () != v2.size ())
+    return false;
+  
+  // otherwise, sort both vectors and return whether they are identical or not
+  sort (v1.begin (), v1.end ());
+  sort (v2.begin (), v2.end ());
+  return (v1 == v2);
+}
+
+// verify that the maps given are equal. Note that the values are vectors and
+// hence these have to be checked with equalVectors
+template<class T>
+bool equalMaps (map<T, vector<T>>& m1, map<T, vector<T>>& m2)
+{
+
+  // if sizes differ then exit immediately
+  if (m1.size () != m2.size ())
+    return false;
+
+  // otherwise, verify that both maps contain precisely the same keys with
+  // precisely the same values
+  for (auto& key1 : m1) {
+
+    // in case this key does not exist in the second map exit immediately with
+    // failure
+    if (m2.find (key1.first) == m2.end ())
+      return false;
+
+    // now, verify that the values for this key are the same in both maps
+    if (!equalVectors<T>(key1.second, m2[key1.first]))
+      return false;
+  }
+
+  // at this point, it can be certified that both maps are the same
+  return true;
+}
+
+// ----------------------------------------------------------------------------
+// INTEGERS
+// ----------------------------------------------------------------------------
+
+// Generate a random number in the interval [-bound, +bound)
+int randInt (int bound);
+
+// ----------------------------------------------------------------------------
+// STRINGS
+// ----------------------------------------------------------------------------
+
+// Generate a random string with characters in the sequence ASCII(45) -
+// ASCII(122) which do not appear in the string exclude. Note that by default
+// exclude makes the random string to contain only alphanum characters and the
+// underscore
+string randString (int length, std::string exclude=":;<=>?@[\\]^`");
+
+// Generate a random quoted string with characters in the sequence ASCII (32) -
+// ASCII (126) which do not appear in the string exclude. Note that by default
+// exclude avoids the quoted string to be prematurely ended
+string randQuotedString (int length, std::string exclude="\"");
+
+// ----------------------------------------------------------------------------
+// GRAPHS
+// ----------------------------------------------------------------------------
+
+// Generate a string with a dot specification of precisely n either undirected
+// (edge_spec=UNDIRECTED_EDGE), directed (edge_spec=DIRECTED_EDGE) or
+// undirected/directed (edge_spec=MIX_EDGE) edges with neither attributes nor
+// labels defined over n/2 vertices.
+//
+// It returns the textual definition of the edges in the DOT language. The
+// collection of random source vertices and edges are returned in dedicated vars.
+string randEdges (int n, int edge_spec,
+		  vector<string>& vertices, map<string, vector<string>>& edges);
+
+// Generate a random graph with precisely n edges defined over n/2 vertices and
+// no attributes at all named after graph_name. It returns the textual
+// definition of the graph in the DOT language. The collection of random
+// vertices and edges are returned in dedicated output vars.
+//
+// The type of the graph is determined by the keyword graph_spec. It is
+// undirected if graph_spec=UNDIRECTED_GRAPH and directed if
+// graph_spec=DIRECTED_GRAPH. The type of edges is determined by edge_spec: they
+// are all undirected if edge_spec=UNDIRECTED_EDGE, directed if
+// edge_spec=DIRECTED_EDGE and a mixture if edge_spec=MIX_EDGE.
+string randGraph (int n, int graph_spec, int edge_spec, const string graph_name,
+		  vector<string>& vertices, map<string, vector<string>>& edges);
+
+#endif 	    /* !TSTHELPERFUNCTIONS_H_ */
+
+
+/* Local Variables: */
+/* mode:c++ */
+/* fill-column:80 */
+/* End: */

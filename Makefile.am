@@ -70,3 +70,24 @@ pkgconfig_DATA = libdot-$(LIBDOT_API_VERSION).pc
 ## archive.  However, it will not be installed on an end user's system due to
 ## the noinst_ prefix.
 dist_noinst_SCRIPTS = autogen.sh
+
+## Google Test
+## ----------------------------------------------------------------------------
+
+## The programs implementing the unit test cases are shown below
+check_PROGRAMS = tests/gtest
+
+## For each one of the programs above, its sources and other options
+## for including and linking are given below. Note the usage of the
+## directive GTEST_* whose value is determined by configure.ac
+tests_gtest_SOURCES  =  tests/gtest.cc \
+			tests/TSThelperfunctions.cc \
+			tests/TSTparser.cc \
+			src/DOTparser.cc
+
+tests_gtest_CXXFLAGS = $(GTEST_CFLAGS)
+tests_gtest_LDADD = $(GTEST_LIBS)
+
+## The variable TESTS is used to determine the binaries that implement
+## the unit test cases
+TESTS = $(check_PROGRAMS)
