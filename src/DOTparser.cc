@@ -228,7 +228,7 @@ bool dot::parser::_process_single_vertex (string& contents,
   // and process also this vertex attributes, if given
   map<string, string> targetdict;
   if (_process_attributes (contents, targetdict))
-    _vertex [target_name] = targetdict;
+    _vertex [target_name].merge (targetdict);
 
   return true;
 }
@@ -260,9 +260,14 @@ bool dot::parser::_process_multiple_vertices (string& contents, const string& or
 	  throw dot::syntax_error ("TARGET_NAME could not be parsed");
 	else {
 
-	  _graph[orig_name].push_back (target_name);
+	  // make sure this target vertex was not processed before
+	  if (find (_graph[orig_name].begin (), _graph[orig_name].end (),
+		    target_name) == _graph[orig_name].end ())
+	    _graph[orig_name].push_back (target_name);
 	  if (edge_type!="->")
-	    _graph[target_name].push_back (orig_name);
+	    if (find (_graph[target_name].begin (), _graph[target_name].end (),
+		      orig_name) == _graph[target_name].end ())
+	      _graph[target_name].push_back (orig_name);
     
 	  // process now the edge attributes given to this vertex and, if given,
 	  // the attributes of the target vertex as well
@@ -302,9 +307,14 @@ bool dot::parser::_process_trajectory (string& contents, string& orig_name)
       throw dot::syntax_error ("a VERTEX_NAME could not be found while parsing a path");
     else {
 
-      _graph[orig_name].push_back (target_name);
+      // make sure this target vertex was not processed before
+      if (find (_graph[orig_name].begin (), _graph[orig_name].end (),
+		target_name) == _graph[orig_name].end ())
+	_graph[orig_name].push_back (target_name);
       if (edge_type!="->")
-	_graph[target_name].push_back (orig_name);
+	if (find (_graph[target_name].begin (), _graph[target_name].end (),
+		  orig_name) == _graph[target_name].end ())
+	  _graph[target_name].push_back (orig_name);
       
       // and update all the edge attributes of this edge and also the attributes
       // of the target vertex if any were given
@@ -374,22 +384,28 @@ std::vector<std::string> dot::parser::get_neighbours (const string& name)
   return _graph[name];
 }
 
+// get all attributes of all vertices of the graph
+std::map<std::string, std::map<std::string, std::string>> dot::parser::get_all_vertex_attributes () const
+{
+  return _vertex;
+}
+
 // get all the attributes of the specified vertex. In case no node is found with
 // the given node an exception is raised.
-std::vector<std::string> dot::parser::get_vertex_attributes (const string& name)
+std::map<std::string, std::string> dot::parser::get_vertex_attributes (const string& name)
 {
-  vector<string> attrs;
   
   // verify that the specified name actually exists
   if (_graph.find (name) == _graph.end ())
     throw dot::syntax_error (" No node with the name '" + name + "' has been found");
 
-  // now, go over the attributes of this specific vertex, and retrieve the
-  // attribute names defined for it
-  for (auto iattr: _vertex[name])
-    attrs.push_back (iattr.first);
-  
-  return attrs;
+  // now, in case there are no vertices defined for this vertex, return an empty
+  // map
+  if (_vertex.find (name) == _vertex.end ())
+    return map<string, string>();
+
+  // otherwise, return its attributes
+  return _vertex[name];
 }
 
 // return the value of an attribute defined for a specific vertex. In case no
@@ -533,7 +549,7 @@ bool dot::parser::parse_string (string contents)
       // and process also its attributes
       map<string, string> origdict;
       if (_process_attributes (contents, origdict))
-	_vertex [orig_name] = origdict;
+	_vertex [orig_name].merge (origdict);
 
       // at this point, the statement could be over if it is a "node statement",
       // i.e., a node along with its attributes. In this case, the statement
@@ -566,10 +582,16 @@ bool dot::parser::parse_string (string contents)
       // the edge from its origin, if given
       else {
 
+	// make sure this target vertex was not already processed ---because it
+	// is a repeated entry
+	if (find (_graph[orig_name].begin (), _graph[orig_name].end (),
+		  target_name) == _graph[orig_name].end ())
 	  _graph[orig_name].push_back (target_name);
-	  if (edge_type!="->")
+	if (edge_type!="->")
+	  if (find (_graph[target_name].begin (), _graph[target_name].end (),
+		    orig_name) == _graph[target_name].end ())
 	    _graph[target_name].push_back (orig_name);
-    
+	
 	// process now the edge attributes given to this vertex and, if given,
 	// the attributes of the target vertex as well
 	_process_single_vertex (contents, orig_name, edge_type, target_name, arcdict);

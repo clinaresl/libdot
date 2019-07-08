@@ -202,10 +202,13 @@ namespace dot {
     // get all nodes that are reachable from a given node. In case no node is
     // found with the given node an exception is raised.
     vector<string> get_neighbours (const string& name);
+
+    // get all attributes of all vertices of the graph
+    map<string, map<string, string>> get_all_vertex_attributes () const;
     
     // get all the attributes of the specified vertex. In case no node is found
     // with the given node an exception is raised.
-    vector<string> get_vertex_attributes (const string& name);
+    map<string, string> get_vertex_attributes (const string& name);
   
     // return the value of an attribute defined for a specific vertex. In case
     // no node is found with the given node, or no attribute with the given name

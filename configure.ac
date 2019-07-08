@@ -17,6 +17,10 @@ AC_PROG_CXX
 # verify that Google Test is installed in the system
 PKG_CHECK_MODULES([GTEST], [gtest_main])
 
+# The following directive is used to ensure compilation under c+11
+AX_CHECK_COMPILE_FLAG([-std=c++0x], [
+                        CXXFLAGS="$CXXFLAGS -std=c++17"])
+
 # newer versions of automake expect a definition for AR
 m4_ifdef([AM_PROG_AR], [AM_PROG_AR])
 
