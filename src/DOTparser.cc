@@ -555,10 +555,14 @@ bool dot::parser::parse_string (string contents)
       // i.e., a node along with its attributes. In this case, the statement
       // should be ended with a semicolon
       _parse_comments (contents);
-      if (_parse_void (contents, END_OF_STATEMENT))
+      if (_parse_void (contents, END_OF_STATEMENT)) {
 
-	// if so, just proceed with the next line
+	// if so, just record this vertex with no neighbours unless it was
+	// already inserted and proceed with the next line
+	if (_graph.find (orig_name) == _graph.end ())
+	  _graph [orig_name] = vector<string>();
 	continue;
+      }
 
       // now, get the edge type, either directed or undirected
       string edge_type;

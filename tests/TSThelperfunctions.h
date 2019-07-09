@@ -120,21 +120,23 @@ void randVertices (int nbvertices, int nbattrs,
 		   vector<string>& vertices,
 		   map<string, map<string, string>>& attributes);
 
-// Generate a vector of strings, each one with the declaration of an edge. The
-// number of edges generated is precisely nbedges and they are either undirected
-// (edge_spec=UNDIRECTED_EDGE), directed (edge_spec=DIRECTED_EDGE) or
-// undirected/directed (edge_spec=MIX_EDGE). Each vertex has a random number of
-// attributes randomly chosen in the interval [0, nbvertexattrs]
+// Generate a vector of strings, each one with the declaration of an edge or a
+// single node statement. It generates precisely nbnodestmts node statements and
+// nbedges edges which are either undirected (edge_spec=UNDIRECTED_EDGE),
+// directed (edge_spec=DIRECTED_EDGE) or undirected/directed
+// (edge_spec=MIX_EDGE). Each vertex has a random number of attributes randomly
+// chosen in the interval [0, nbvertexattrs]
 //
 // The collection of random source vertices and edges are returned in dedicated
-// vars. In addition, the vertex attributes of all vertices randomly chosen are
-// also returned in a dedicated container.
-vector<string> randEdges (int nbedges, int nbvertexattrs, int edge_spec,
+// vars. In addition, the vertex attributes of all vertices randomly chosen
+// (either those appearing in edges or as node statements) are also returned in
+// a dedicated container.
+vector<string> randEdges (int nbnodestmts, int nbedges, int nbvertexattrs, int edge_spec,
 			  vector<string>& vertices, map<string, vector<string>>& edges,
 			  map<string, map<string, string>>& vertexattrs);
-
-// Generate a random graph with precisely nbedges edges defined over nbedges/2
-// vertices, and nblabels labels, and no attributes at all named after
+  
+// Generate a random graph with precisely nbnodestmts node statements, nbedges
+// edges defined over nbedges/2 vertices, and nblabels labels named after
 // graph_name. It returns the textual definition of the graph in the DOT
 // language.
 //
@@ -147,7 +149,7 @@ vector<string> randEdges (int nbedges, int nbvertexattrs, int edge_spec,
 // graph_spec=DIRECTED_GRAPH. The type of edges is determined by edge_spec: they
 // are all undirected if edge_spec=UNDIRECTED_EDGE, directed if
 // edge_spec=DIRECTED_EDGE and a mixture if edge_spec=MIX_EDGE.
-string randGraph (int nbedges, int nblabels, int nbvertexattrs, 
+string randGraph (int nbnodestmts, int nbedges, int nblabels, int nbvertexattrs, 
 		  const string graph_name,
 		  int graph_spec, int edge_spec, 
 		  vector<string>& vertices, map<string, vector<string>>& edges,
