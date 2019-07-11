@@ -216,13 +216,17 @@ bool dot::parser::_process_single_vertex (string& contents,
   // given
   if (arcdict.size ()) {
 
+    map<string, string> mergeddict {arcdict};
+    
     // Syntax: [orig][target][attr name] = attr value
-    _edge[orig_name][target_name] = arcdict;
+    _edge[orig_name][target_name].merge (arcdict);
 
     // also, in case this is an edge of the form "--" then annotate the same
-    // attribute to the reversed direction
-    if (edge_type == "--")
-      _edge[target_name][orig_name] = arcdict;
+    // attributes in the reversed direction
+    if (edge_type == "--") {
+      arcdict = mergeddict;
+      _edge[target_name][orig_name].merge (arcdict);
+    }
   }
 		
   // and process also this vertex attributes, if given
@@ -427,13 +431,19 @@ std::string dot::parser::get_vertex_attribute (const string& name, const string&
   return _vertex[name][attrname];
 }
 
+// get the edge attributes for all edges in the graph that have any
+std::map<std::string, std::map<std::string, std::map<std::string, std::string>>> dot::parser::get_all_edge_attributes ()
+{
+  return _edge;
+}
+
 // get all the attributes of a specific edge qualified by its (origin,target)
 // names. If either the origin does not exist, or the target is not found to be
 // a neighbour of the origin, an exception is raised.
-std::vector<std::string> dot::parser::get_edge_attributes (const string& origin,
-							   const string& target)
+std::map<std::string, std::string> dot::parser::get_edge_attributes (const string& origin,
+								     const string& target)
 {
-  vector<string> attrs;
+  map<string, string> attrs;
 
   // verify that the specified origin actually exists
   if (_graph.find (origin) == _graph.end ())
@@ -445,26 +455,14 @@ std::vector<std::string> dot::parser::get_edge_attributes (const string& origin,
   if (find (_graph[origin].begin (), _graph[origin].end (), target) == _graph[origin].end ())
     throw dot::syntax_error (" The node '" + origin + "' has no neighbour with the name '" + target + "'");
 
-  // now, verify that the pair (origin,target) exists in the map of edge
-  // attributes
-  typename map<string,map<string,map<string,string>>>::iterator iattrs = _edge.find (origin);
-  if (iattrs!=_edge.end ()) {
-    typename map<string,map<string,string>>::iterator jattrs = iattrs->second.find (target);
-    if (jattrs != iattrs->second.end ()) {
-
-      // now, return all the attributes in this map
-      for (auto& kattr: jattrs->second)
-	attrs.push_back (kattr.first);
-    }
-  }
-
-  return attrs;
+  // and return the attributes of this edge
+  return _edge [origin][target];
 }
 
 // return the value of the given attribute defined for the vertex qualified by
 // (origin,target) names. If either the origin does not exist, or the target is
 // not found to be a neighbour of the origin, or no attribute is found in the
-// edge joining those two vertices, an exception is raised.
+// edge joining those two vertices with the given name, an exception is raised.
 std::string dot::parser::get_edge_attribute (const string& origin,
 					     const string& target,
 					     const string& attr)

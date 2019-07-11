@@ -102,12 +102,25 @@ string randQuotedString (int length, std::string exclude="\"");
 // and the value is the label value
 vector<string> randLabels (int nblabels, map<string, string>& labels);
 
+// given a map of attributes (key=value) return a specification of attributes in
+// the DOT language. The attributes actually included are returned in the map
+// used_attrs
+string generateDotAttrs (map<string, string>& attrs,
+			 map<string, string>& used_attrs);
+
 // given a map of attributes (key=value), return a dot specification of a node
 // named after name with a random selection of attributes ---which could be
 // repeated or not. The attributes actually included are returned in the map
 // used_attrs
 string generateDotVertex (const string& name, map<string, string>& attrs,
 			  map<string, string>& used_attrs);
+
+// given a map of attributes (key=value), return a dot specification of an edge
+// according to the given edge_spec which can be either undirected
+// (edge_spec=UNDIRECTED_EDGE) or directed (edge_spec=DIRECTED_EDGE). The
+// attributes actually included are returned in the map used_attrs
+string generateDotEdge (const int edge_spec, map<string, string>& attrs,
+			map<string, string>& used_attrs);
 
 // generate precisely nbvertices vertices each with a random number of
 // attributes in the range [0, nbattrs] which are returned in the map
@@ -125,36 +138,43 @@ void randVertices (int nbvertices, int nbattrs,
 // nbedges edges which are either undirected (edge_spec=UNDIRECTED_EDGE),
 // directed (edge_spec=DIRECTED_EDGE) or undirected/directed
 // (edge_spec=MIX_EDGE). Each vertex has a random number of attributes randomly
-// chosen in the interval [0, nbvertexattrs]
+// chosen in the interval [0, nbvertexattrs]. Likewise, each edge has a random
+// number of attributes randomly chosen in the interval [0, nbedgeattrs].
 //
 // The collection of random source vertices and edges are returned in dedicated
 // vars. In addition, the vertex attributes of all vertices randomly chosen
-// (either those appearing in edges or as node statements) are also returned in
-// a dedicated container.
-vector<string> randEdges (int nbnodestmts, int nbedges, int nbvertexattrs, int edge_spec,
+// (either those appearing in edges or as node statements) and the edges
+// attributes are also returned in a dedicated container.
+vector<string> randEdges (int nbnodestmts, int nbedges,
+			  int nbvertexattrs, int nbedgeattrs, int edge_spec,
 			  vector<string>& vertices, map<string, vector<string>>& edges,
-			  map<string, map<string, string>>& vertexattrs);
+			  map<string, map<string, string>>& vertexattrs,
+			  map<string, map<string, map<string, string>>>& edgeattrs);
   
 // Generate a random graph with precisely nbnodestmts node statements, nbedges
 // edges defined over nbedges/2 vertices, and nblabels labels named after
 // graph_name. It returns the textual definition of the graph in the DOT
-// language.
+// language. Each vertex has a random number of attributes randomly chosen in
+// the interval [0, nbvertexattrs]. Likewise, each edge has a random number of
+// attributes randomly chosen in the interval [0, nbedgeattrs].
 //
-// The collection of random vertices and edges are returned in dedicated output
-// vars. In addition, the labels and all the vertex attributes and their values
-// are also returned in dedicated maps.
+// The collection of random vertices, edges and labels are returned in dedicated
+// output vars. Also, the attributes selected for all vertices and edges are
+// returned also in dedicated variables.
 //
 // The type of the graph is determined by the keyword graph_spec. It is
 // undirected if graph_spec=UNDIRECTED_GRAPH and directed if
 // graph_spec=DIRECTED_GRAPH. The type of edges is determined by edge_spec: they
 // are all undirected if edge_spec=UNDIRECTED_EDGE, directed if
 // edge_spec=DIRECTED_EDGE and a mixture if edge_spec=MIX_EDGE.
-string randGraph (int nbnodestmts, int nbedges, int nblabels, int nbvertexattrs, 
+string randGraph (int nbnodestmts, int nbedges, int nblabels,
+		  int nbvertexattrs, int nbedgeattrs, 
 		  const string graph_name,
 		  int graph_spec, int edge_spec, 
 		  vector<string>& vertices, map<string, vector<string>>& edges,
 		  map<string, string>& labels,
-		  map<string, map<string, string>>& vertexattrs);
+		  map<string, map<string, string>>& vertexattrs,
+		  map<string, map<string, map<string, string>>>& edgeattrs);
 
 #endif 	    /* !TSTHELPERFUNCTIONS_H_ */
 

@@ -215,15 +215,19 @@ namespace dot {
     // is found for the specified node, an exception is raised.
     string get_vertex_attribute (const string& name, const string& attrname);
 
+    // get the edge attributes for all edges in the graph that have any
+    map<string, map<string, map<string, string>>> get_all_edge_attributes ();
+    
     // get all the attributes of a specific edge qualified by its
     // (origin,target) names. If either the origin does not exist, or the target
     // is not found to be a neighbour of the origin, an exception is raised.
-    vector<string> get_edge_attributes (const string& origin, const string& target);
+    map<string, string> get_edge_attributes (const string& origin, const string& target);
 
     // return the value of the given attribute defined for the vertex qualified
     // by (origin,target) names. If either the origin does not exist, or the
     // target is not found to be a neighbour of the origin, or no attribute is
-    // found in the edge joining those two vertices, an exception is raised.
+    // found in the edge joining those two vertices with the given name, an
+    // exception is raised.
     string get_edge_attribute (const string& origin, const string& target, const string& attr);
 
     // Sets the verbose level to true by default
