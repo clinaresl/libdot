@@ -122,6 +122,22 @@ string generateDotVertex (const string& name, map<string, string>& attrs,
 string generateDotEdge (const int edge_spec, map<string, string>& attrs,
 			map<string, string>& used_attrs);
 
+// generate up to nbnodestmts node statements randomly chosen among the vector
+// of vertices and returns the specification in the DOT language as a vector of
+// strings, each one with the specification of a single node statement. Each
+// vertex can be decorated with vertex attributes which are randomly chosen
+// among those in vertexselectedattrs.
+//
+// The vertices selected are returned in used_vertices, and the vertex
+// attributes randomly picked up are returned in vertexattrs. It also updates
+// information about the adjacency of the graph by adding the vertices without
+// any neighbours
+vector<string> randNodeStatements (int nbnodestmts, vector<string>& vertices,
+				   map<string, map<string, string>>& vertexselectedattrs,
+				   set<string>& used_vertices,
+				   map<string, map<string, string>>& vertexattrs,
+				   map<string, vector<string>>& edges);
+
 // generate precisely nbvertices vertices each with a random number of
 // attributes in the range [0, nbattrs] which are returned in the map
 // attributes. The name of the vertices randomly generated are returned in
@@ -133,26 +149,65 @@ void randVertices (int nbvertices, int nbattrs,
 		   vector<string>& vertices,
 		   map<string, map<string, string>>& attributes);
 
-// Generate a vector of strings, each one with the declaration of an edge or a
-// single node statement. It generates precisely nbnodestmts node statements and
-// nbedges edges which are either undirected (edge_spec=UNDIRECTED_EDGE),
-// directed (edge_spec=DIRECTED_EDGE) or undirected/directed
-// (edge_spec=MIX_EDGE). Each vertex has a random number of attributes randomly
-// chosen in the interval [0, nbvertexattrs]. Likewise, each edge has a random
-// number of attributes randomly chosen in the interval [0, nbedgeattrs].
+// returns the declaration of a vertex in the DOT language. The vertex is
+// randomly chosen among those in vertices and its name is returned in name.
+//
+// The vertex might be decorated with attributes among those in
+// vertexselectedattrs. Those effecitvely used are returned in vertexattrs.
+string randVertex (vector<string>& vertices, string& name,
+		   map<string, map<string, string>>& vertexselectedattrs,
+		   map<string, map<string, string>>& vertexattrs);
+
+// generate a path of the given length in the DOT language, where the path
+// length is measured as the number of edges and should be strictly greater or
+// equal than one.
+//
+// The path generated starts with an edge of the specified type which can be
+// either undirected (edge_spec=UNDIRECTED_EDGE), directed
+// (edge_spec=DIRECTED_EDGE) or undirected/directed (edge_spec=MIX_EDGE).
+//
+// Each vertex is randomly chosen from the vector of vertices.
+//
+// Both vertices and edges can be decorated with attributes randomly chosen from
+// vertexselectedattrs and edgeselectedattrs.
+//
+// This function updates the following information:
+//
+// edges: contains the edges randomly created in the final graph
+// used_vertices: contains the vertices randomly selected in the final graph
+// vertexattrs: vertex attributes finally chosen in the final graph
+// edgeattrs: edge attributes finally chosen in the final graph
+string randPath (int pathlength, int edge_spec,
+		 vector<string>& vertices,
+		 map<string, vector<string>>& edges,
+		 map<string, map<string, string>>& vertexselectedattrs,
+		 map<string, string>& edgeselectedattrs,
+		 set<string>& used_vertices,
+		 map<string, map<string, string>>& vertexattrs,
+		 map<string, map<string, map<string, string>>>& edgeattrs);
+
+// Generate a vector of strings, each one with the declaration of a path with a
+// length randomly chosen in the interval [1, pathlength] or a single node
+// statement. It generates precisely nbnodestmts node statements and nbedges
+// edges which are either undirected (edge_spec=UNDIRECTED_EDGE), directed
+// (edge_spec=DIRECTED_EDGE) or undirected/directed (edge_spec=MIX_EDGE). Each
+// vertex has a random number of attributes randomly chosen in the interval [0,
+// nbvertexattrs]. Likewise, each edge has a random number of attributes
+// randomly chosen in the interval [0, nbedgeattrs].
 //
 // The collection of random source vertices and edges are returned in dedicated
 // vars. In addition, the vertex attributes of all vertices randomly chosen
 // (either those appearing in edges or as node statements) and the edges
 // attributes are also returned in a dedicated container.
-vector<string> randEdges (int nbnodestmts, int nbedges,
+vector<string> randEdges (int nbnodestmts, int nbedges, int pathlength,
 			  int nbvertexattrs, int nbedgeattrs, int edge_spec,
 			  vector<string>& vertices, map<string, vector<string>>& edges,
 			  map<string, map<string, string>>& vertexattrs,
 			  map<string, map<string, map<string, string>>>& edgeattrs);
   
 // Generate a random graph with precisely nbnodestmts node statements, nbedges
-// edges defined over nbedges/2 vertices, and nblabels labels named after
+// edge statements defined over nbedges/2 vertices, each one with a random
+// length between 1 and pathlength, and nblabels labels named after
 // graph_name. It returns the textual definition of the graph in the DOT
 // language. Each vertex has a random number of attributes randomly chosen in
 // the interval [0, nbvertexattrs]. Likewise, each edge has a random number of
@@ -167,7 +222,7 @@ vector<string> randEdges (int nbnodestmts, int nbedges,
 // graph_spec=DIRECTED_GRAPH. The type of edges is determined by edge_spec: they
 // are all undirected if edge_spec=UNDIRECTED_EDGE, directed if
 // edge_spec=DIRECTED_EDGE and a mixture if edge_spec=MIX_EDGE.
-string randGraph (int nbnodestmts, int nbedges, int nblabels,
+string randGraph (int nbnodestmts, int nbedges, int nblabels, int pathlength,
 		  int nbvertexattrs, int nbedgeattrs, 
 		  const string graph_name,
 		  int graph_spec, int edge_spec, 

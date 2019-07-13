@@ -1,0 +1,10 @@
+// Example #5b from https://graphs.grevian.org/example
+
+graph {
+    a -- b -- d -- c -- f[color=red,penwidth=3.0];
+    b -- c;
+    d -- e;
+    e -- f;
+    a -- d;
+}
+

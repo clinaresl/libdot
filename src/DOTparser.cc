@@ -301,9 +301,8 @@ bool dot::parser::_process_trajectory (string& contents, string& orig_name)
 
     map<string, string> nestedarcdict;
 	  
-    // yeah! A path is listed, so make the target vertex the origin, and
-    // parse the attributes of this edge if any were given
-    orig_name = target_name;
+    // yeah! A path is listed, parse the attributes of this edge if any were
+    // given
     _process_attributes (contents, nestedarcdict);
 
     // get the target vertex of this specific edge
@@ -324,6 +323,9 @@ bool dot::parser::_process_trajectory (string& contents, string& orig_name)
       // of the target vertex if any were given
       _process_single_vertex (contents, orig_name, edge_type, target_name, nestedarcdict);
     }
+
+    // and now make the
+    orig_name = target_name;    
   }
 
   return true;

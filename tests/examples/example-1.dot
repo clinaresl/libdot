@@ -1,0 +1,10 @@
+// Example #1 from https://graphs.grevian.org/example
+
+graph example_1 {
+    a -- b;
+    b -- c;
+    a -- c;
+    d -- c;
+    e -- c;
+    e -- a;
+}

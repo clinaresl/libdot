@@ -189,7 +189,7 @@ TEST (Parser, DISABLED_GetTypeAnonymousGraph)
     // -- undirected graphs
     
     // create an undirected anonymous graph randomly
-    string dotgraph {randGraph (0, 10, 0, 0, 0, "", UNDIRECTED_GRAPH, UNDIRECTED_EDGE, 
+    string dotgraph {randGraph (0, 10, 0, 1, 0, 0, "", UNDIRECTED_GRAPH, UNDIRECTED_EDGE, 
 				vertices, edges, labels, vertexattrs, edgeattrs)};
 
     // parse the graph
@@ -201,7 +201,7 @@ TEST (Parser, DISABLED_GetTypeAnonymousGraph)
     // -- directed graphs
     
     // create an undirected anonymous graph randomly
-    dotgraph = randGraph (0, 10, 0, 0, 0, "", DIRECTED_GRAPH, DIRECTED_EDGE,
+    dotgraph = randGraph (0, 10, 0, 1, 0, 0, "", DIRECTED_GRAPH, DIRECTED_EDGE,
 			  vertices, edges, labels, vertexattrs, edgeattrs);
 
     // parse the graph
@@ -237,7 +237,7 @@ TEST (Parser, DISABLED_GetTypeNamedGraph)
     // -- undirected graphs
     
     // create an undirected graph randomly with the given name
-    string dotgraph {randGraph (0, 10, 0, 0, 0, graphname, UNDIRECTED_GRAPH, UNDIRECTED_EDGE, 
+    string dotgraph {randGraph (0, 10, 0, 1, 0, 0, graphname, UNDIRECTED_GRAPH, UNDIRECTED_EDGE, 
 				vertices, edges, labels, vertexattrs, edgeattrs)};
 
     // parse the graph
@@ -249,7 +249,7 @@ TEST (Parser, DISABLED_GetTypeNamedGraph)
     // -- directed graphs
     
     // create a directed graph randomly with the given name
-    dotgraph = randGraph (0, 10, 0, 0, 0, graphname, DIRECTED_GRAPH, DIRECTED_EDGE, 
+    dotgraph = randGraph (0, 10, 0, 1, 0, 0, graphname, DIRECTED_GRAPH, DIRECTED_EDGE, 
 			  vertices, edges, labels, vertexattrs, edgeattrs);
 
     // parse the graph
@@ -282,7 +282,7 @@ TEST (Parser, DISABLED_GetNameAnonymousGraph)
     // -- undirected graphs
     
     // create an anonymous undirected graph randomly
-    string dotgraph {randGraph (0, 10, 0, 0, 0, "", UNDIRECTED_GRAPH, UNDIRECTED_EDGE, 
+    string dotgraph {randGraph (0, 10, 0, 1, 0, 0, "", UNDIRECTED_GRAPH, UNDIRECTED_EDGE, 
 				vertices, edges, labels, vertexattrs, edgeattrs)};
 
     // parse the graph
@@ -294,7 +294,7 @@ TEST (Parser, DISABLED_GetNameAnonymousGraph)
     // -- directed graphs
     
     // create an anonymous directed graph randomly
-    dotgraph = randGraph (0, 10, 0, 0, 0, "", DIRECTED_GRAPH, DIRECTED_EDGE,
+    dotgraph = randGraph (0, 10, 0, 1, 0, 0, "", DIRECTED_GRAPH, DIRECTED_EDGE,
 			  vertices, edges, labels, vertexattrs, edgeattrs);
 
     // parse the graph
@@ -330,7 +330,7 @@ TEST (Parser, DISABLED_GetNameNamedGraph)
     // -- undirected graphs
     
     // create an undirected graph randomly with the given name
-    string dotgraph {randGraph (0, 10, 0, 0, 0, graphname, UNDIRECTED_GRAPH, UNDIRECTED_EDGE,
+    string dotgraph {randGraph (0, 10, 0, 1, 0, 0, graphname, UNDIRECTED_GRAPH, UNDIRECTED_EDGE,
 				vertices, edges, labels, vertexattrs, edgeattrs)};
 
     // parse the graph
@@ -342,7 +342,7 @@ TEST (Parser, DISABLED_GetNameNamedGraph)
     // -- directed graphs
     
     // create a directed graph randomly with the given name
-    dotgraph = randGraph (0, 10, 0, 0, 0, graphname, DIRECTED_GRAPH, DIRECTED_EDGE, 
+    dotgraph = randGraph (0, 10, 0, 1, 0, 0, graphname, DIRECTED_GRAPH, DIRECTED_EDGE, 
 			  vertices, edges, labels, vertexattrs, edgeattrs);
 
     // parse the graph
@@ -379,7 +379,7 @@ TEST (Parser, DISABLED_GetVerticesPlainNamedGraph)
     // -- undirected graphs
     
     // create an undirected graph randomly with the given name
-    string dotgraph {randGraph (0, 10, 0, 0, 0, graphname, UNDIRECTED_GRAPH, UNDIRECTED_EDGE, 
+    string dotgraph {randGraph (0, 10, 0, 1, 0, 0, graphname, UNDIRECTED_GRAPH, UNDIRECTED_EDGE, 
 				vertices, edges, labels, vertexattrs, edgeattrs)};
 
     // parse the graph
@@ -394,7 +394,7 @@ TEST (Parser, DISABLED_GetVerticesPlainNamedGraph)
     // -- directed graphs
     
     // create an undirected graph randomly with the given name
-    dotgraph = randGraph (0, 10, 0, 0, 0, graphname, DIRECTED_GRAPH, DIRECTED_EDGE,
+    dotgraph = randGraph (0, 10, 0, 1, 0, 0, graphname, DIRECTED_GRAPH, DIRECTED_EDGE,
     			  vertices, edges, labels, vertexattrs, edgeattrs);
 
     // parse the graph
@@ -434,7 +434,7 @@ TEST (Parser, DISABLED_GetEdgesPlainNamedGraph)
     // -- undirected graphs
     
     // create an undirected graph randomly with the given name
-    string dotgraph {randGraph (0, 10, 0, 0, 0, graphname, UNDIRECTED_GRAPH, UNDIRECTED_EDGE,
+    string dotgraph {randGraph (0, 10, 0, 1, 0, 0, graphname, UNDIRECTED_GRAPH, UNDIRECTED_EDGE,
 				vertices, edges, labels, vertexattrs, edgeattrs)};
 
     // parse the graph
@@ -448,7 +448,7 @@ TEST (Parser, DISABLED_GetEdgesPlainNamedGraph)
     // -- directed graphs
     
     // create an undirected graph randomly with the given name
-    dotgraph = randGraph (0, 10, 0, 0, 0, graphname, DIRECTED_GRAPH, DIRECTED_EDGE, 
+    dotgraph = randGraph (0, 10, 0, 1, 0, 0, graphname, DIRECTED_GRAPH, DIRECTED_EDGE, 
 			  vertices, edges, labels, vertexattrs, edgeattrs);
 
     // parse the graph
@@ -483,7 +483,7 @@ TEST (Parser, DISABLED_GetNeighbours)
     // -- undirected graphs
     
     // generate a random graph
-    string dotgraph = randGraph (10, 10, 0, 0, 0, randString (10), UNDIRECTED_GRAPH, UNDIRECTED_EDGE,
+    string dotgraph = randGraph (10, 10, 0, 1, 0, 0, randString (10), UNDIRECTED_GRAPH, UNDIRECTED_EDGE,
 				 vertices, edges, labels, vertexattrs, edgeattrs);
 
     // create a dot parser and parse the dot graph
@@ -503,7 +503,7 @@ TEST (Parser, DISABLED_GetNeighbours)
     // -- directed graphs
     
     // generate a random graph
-    dotgraph = randGraph (10, 10, 0, 0, 0, randString (10), DIRECTED_GRAPH, DIRECTED_EDGE,
+    dotgraph = randGraph (10, 10, 0, 1, 0, 0, randString (10), DIRECTED_GRAPH, DIRECTED_EDGE,
 			  vertices, edges, labels, vertexattrs, edgeattrs);
 
     // create a dot parser and parse the dot graph
@@ -544,7 +544,7 @@ TEST (Parser, DISABLED_GetLabels)
     // -- undirected graphs
     
     // generate a random graph
-    string dotgraph = randGraph (0, 10, 10, 0, 0, randString (10), DIRECTED_GRAPH, MIX_EDGE,
+    string dotgraph = randGraph (0, 10, 10, 1, 0, 0, randString (10), DIRECTED_GRAPH, MIX_EDGE,
 				 vertices, edges, labels, vertexattrs, edgeattrs);
 
     // create a dot parser and parse the dot graph
@@ -604,7 +604,7 @@ TEST (Parser, DISABLED_GetAllVertexAttributes)
       // -- undirected graphs
     
       // create an undirected graph randomly with the given name
-      string dotgraph {randGraph (0, 10, 0, j, 0, graphname, UNDIRECTED_GRAPH, UNDIRECTED_EDGE,
+      string dotgraph {randGraph (0, 10, 0, 1, j, 0, graphname, UNDIRECTED_GRAPH, UNDIRECTED_EDGE,
 				  vertices, edges, labels, vertexattrs, edgeattrs)};
 
       // parse the graph
@@ -631,7 +631,7 @@ TEST (Parser, DISABLED_GetAllVertexAttributes)
       // -- directed graphs
     
       // create a directed graph randomly with the given name
-      dotgraph = randGraph (0, 10, 0, j, 0, graphname, DIRECTED_GRAPH, DIRECTED_EDGE,
+      dotgraph = randGraph (0, 10, 0, 1, j, 0, graphname, DIRECTED_GRAPH, DIRECTED_EDGE,
 			    vertices, edges, labels, vertexattrs, edgeattrs);
 
       // parse the graph
@@ -688,7 +688,7 @@ TEST (Parser, DISABLED_GetVertexAttributesByName)
       // -- undirected graphs
     
       // create an undirected graph randomly with the given name
-      string dotgraph {randGraph (0, 10, 0, j, 0, graphname, UNDIRECTED_GRAPH, UNDIRECTED_EDGE,
+      string dotgraph {randGraph (0, 10, 0, 1, j, 0, graphname, UNDIRECTED_GRAPH, UNDIRECTED_EDGE,
 				  vertices, edges, labels, vertexattrs, edgeattrs)};
 
       // parse the graph
@@ -707,7 +707,7 @@ TEST (Parser, DISABLED_GetVertexAttributesByName)
       // -- directed graphs
     
       // create an undirected graph randomly with the given name
-      dotgraph = randGraph (0, 10, 0, j, 0, graphname, DIRECTED_GRAPH, DIRECTED_EDGE,
+      dotgraph = randGraph (0, 10, 0, 1, j, 0, graphname, DIRECTED_GRAPH, DIRECTED_EDGE,
 			    vertices, edges, labels, vertexattrs, edgeattrs);
 
       // parse the graph
@@ -756,7 +756,7 @@ TEST (Parser, DISABLED_GetSingleVertexAttributeByName)
       // -- undirected graphs
     
       // create an undirected graph randomly with the given name
-      string dotgraph {randGraph (0, 10, 0, j, 0, graphname, UNDIRECTED_GRAPH, UNDIRECTED_EDGE,
+      string dotgraph {randGraph (0, 10, 0, 1, j, 0, graphname, UNDIRECTED_GRAPH, UNDIRECTED_EDGE,
 				  vertices, edges, labels, vertexattrs, edgeattrs)};
 
       // parse the graph
@@ -776,7 +776,7 @@ TEST (Parser, DISABLED_GetSingleVertexAttributeByName)
       // -- directed graphs
     
       // create an undirected graph randomly with the given name
-      dotgraph = randGraph (0, 10, 0, j, 0, graphname, UNDIRECTED_GRAPH, UNDIRECTED_EDGE,
+      dotgraph = randGraph (0, 10, 0, 1, j, 0, graphname, DIRECTED_GRAPH, DIRECTED_EDGE,
 			    vertices, edges, labels, vertexattrs, edgeattrs);
 
       // parse the graph
@@ -827,7 +827,7 @@ TEST (Parser, DISABLED_GetNodeStatements)
       // -- undirected graphs
     
       // create an undirected graph randomly with the given name
-      string dotgraph {randGraph (4, 10, 0, j, 0, graphname, UNDIRECTED_GRAPH, UNDIRECTED_EDGE,
+      string dotgraph {randGraph (4, 10, 0, 1, j, 0, graphname, UNDIRECTED_GRAPH, UNDIRECTED_EDGE,
 				  vertices, edges, labels, vertexattrs, edgeattrs)};
 
       // parse the graph
@@ -859,7 +859,7 @@ TEST (Parser, DISABLED_GetNodeStatements)
       // -- directed graphs
     
       // create a directed graph randomly with the given name
-      dotgraph = randGraph (4, 10, 0, j, 0, graphname, DIRECTED_GRAPH, DIRECTED_EDGE,
+      dotgraph = randGraph (4, 10, 0, 1, j, 0, graphname, DIRECTED_GRAPH, DIRECTED_EDGE,
 			    vertices, edges, labels, vertexattrs, edgeattrs);
 
       // parse the graph
@@ -921,7 +921,7 @@ TEST (Parser, DISABLED_GetAllEdgeAttributes)
       // -- undirected graphs
     
       // create an undirected graph randomly with the given name
-      string dotgraph {randGraph (0, 10, 0, 0, j, graphname, UNDIRECTED_GRAPH, UNDIRECTED_EDGE,
+      string dotgraph {randGraph (0, 10, 0, 1, 0, j, graphname, UNDIRECTED_GRAPH, UNDIRECTED_EDGE,
 				  vertices, edges, labels, vertexattrs, edgeattrs)};
     
       // parse the graph
@@ -952,7 +952,7 @@ TEST (Parser, DISABLED_GetAllEdgeAttributes)
       // -- directed graphs
     
       // create a directed graph randomly with the given name
-      dotgraph = randGraph (0, 10, 0, 0, j, graphname, DIRECTED_GRAPH, DIRECTED_EDGE,
+      dotgraph = randGraph (0, 10, 0, 1, 0, j, graphname, DIRECTED_GRAPH, DIRECTED_EDGE,
 			    vertices, edges, labels, vertexattrs, edgeattrs);
     
       // parse the graph
@@ -1013,7 +1013,7 @@ TEST (Parser, DISABLED_GetEdgeAttributesByName)
       // -- undirected graphs
     
       // create an undirected graph randomly with the given name
-      string dotgraph {randGraph (0, 10, 0, 0, j, graphname, UNDIRECTED_GRAPH, UNDIRECTED_EDGE,
+      string dotgraph {randGraph (0, 10, 0, 1, 0, j, graphname, UNDIRECTED_GRAPH, UNDIRECTED_EDGE,
 				  vertices, edges, labels, vertexattrs, edgeattrs)};
     
       // parse the graph
@@ -1035,7 +1035,7 @@ TEST (Parser, DISABLED_GetEdgeAttributesByName)
       // -- directed graphs
     
       // create a directed graph randomly with the given name
-      dotgraph = randGraph (0, 10, 0, 0, j, graphname, DIRECTED_GRAPH, DIRECTED_EDGE,
+      dotgraph = randGraph (0, 10, 0, 1, 0, j, graphname, DIRECTED_GRAPH, DIRECTED_EDGE,
 			    vertices, edges, labels, vertexattrs, edgeattrs);
     
       // parse the graph
@@ -1087,7 +1087,7 @@ TEST (Parser, DISABLED_GetSingleEdgeAttributeByName)
       // -- undirected graphs
     
       // create an undirected graph randomly with the given name
-      string dotgraph {randGraph (0, 10, 0, 0, j, graphname, UNDIRECTED_GRAPH, UNDIRECTED_EDGE,
+      string dotgraph {randGraph (0, 10, 0, 1, 0, j, graphname, UNDIRECTED_GRAPH, UNDIRECTED_EDGE,
 				  vertices, edges, labels, vertexattrs, edgeattrs)};
     
       // parse the graph
@@ -1114,7 +1114,488 @@ TEST (Parser, DISABLED_GetSingleEdgeAttributeByName)
       // -- directed graphs
     
       // create a directed graph randomly with the given name
-      dotgraph = randGraph (0, 10, 0, 0, j, graphname, DIRECTED_GRAPH, DIRECTED_EDGE,
+      dotgraph = randGraph (0, 10, 0, 1, 0, j, graphname, DIRECTED_GRAPH, DIRECTED_EDGE,
+			    vertices, edges, labels, vertexattrs, edgeattrs);
+    
+      // parse the graph
+      dot::parser diparser;
+      diparser.parse_string (dotgraph);
+    
+      // now, go over all edges of this graph
+      for (auto& edge : edges) {
+
+	for (auto& target : edge.second) {
+
+	  // and now over all attributes of this edge
+	  for (auto& attr : edgeattrs[edge.first][target]) {
+	  
+	    // retrieve all the attributes of this edge
+	    string dotedgeattr = diparser.get_edge_attribute (edge.first, target, attr.first);
+	  
+	    // now verify that the value of this attribute of this edge has been
+	    // properly processed
+	    ASSERT_EQ (dotedgeattr, attr.second) << dotgraph << endl;
+	  }
+	}
+      }
+    }
+  }
+}
+
+// Checks that vertex attributes are properly processed both in directed and
+// undirected graphs by querying all of them simultaneously in the presence of
+// paths. The test considers 4 attributes per vertex and path length in the
+// range [1, 5].
+// ----------------------------------------------------------------------------
+TEST (Parser, DISABLED_GetAllVertexAttributesPath)
+{
+
+  vector<string> vertices;
+  map<string, vector<string>> edges;
+  map<string, string> labels;
+  map<string, map<string, string>> vertexattrs;
+  map<string, map<string, map<string, string>>> edgeattrs;
+
+  srand(time(nullptr));  
+
+  for (auto i = 0 ; i < NB_TESTS ; i++) {
+
+    // for paths of length randomly chosen in the range [1, j]
+    for (auto j = 0 ; j < 5 ; j++ ) {
+    
+      // create a dot parser
+      dot::parser parser;
+    
+      // randomly choose a name for this graph
+      string graphname = randString (10);
+
+      // -- undirected graphs
+    
+      // create an undirected graph randomly with the given name
+      string dotgraph {randGraph (0, 10, 0, j, 4, 0, graphname, UNDIRECTED_GRAPH, UNDIRECTED_EDGE, 
+				  vertices, edges, labels, vertexattrs, edgeattrs)};
+
+
+      // parse the graph
+      parser.parse_string (dotgraph);
+
+      // check that the map with all attributes for all vertices is properly
+      // returned
+      map<string, map<string, string>> dotvertexattrs = parser.get_all_vertex_attributes ();
+    
+      // first, verify that both maps have precisely the same size
+      ASSERT_EQ (vertexattrs.size (), dotvertexattrs.size ()) << dotgraph << endl;
+    
+      // now, ensure also that both maps have the same information for all
+      // vertices in the random graph
+      for (auto& vertex : vertices) {
+      
+	// if this vertex is specified in either map, then assert that both maps
+	// have precisely the same information
+	if (vertexattrs.find (vertex) != vertexattrs.end () ||
+	    dotvertexattrs.find (vertex) != dotvertexattrs.end ())
+	  ASSERT_EQ (vertexattrs[vertex], dotvertexattrs[vertex]) << dotgraph << endl;
+      }
+
+      // -- directed graphs
+    
+      // create an undirected graph randomly with the given name
+      dotgraph = randGraph (0, 10, 0, j, 4, 0, graphname, DIRECTED_GRAPH, DIRECTED_EDGE, 
+			    vertices, edges, labels, vertexattrs, edgeattrs);
+
+      // parse the graph
+      dot::parser diparser;
+      diparser.parse_string (dotgraph);
+
+      // check that the map with all attributes for all vertices is properly
+      // returned
+      dotvertexattrs = diparser.get_all_vertex_attributes ();
+    
+      // first, verify that both maps have precisely the same size
+      ASSERT_EQ (vertexattrs.size (), dotvertexattrs.size ()) << dotgraph << endl;
+    
+      // now, ensure also that both maps have the same information for all
+      // vertices in the random graph
+      for (auto& vertex : vertices) {
+      
+	// if this vertex is specified in either map, then assert that both maps
+	// have precisely the same information
+	if (vertexattrs.find (vertex) != vertexattrs.end () ||
+	    dotvertexattrs.find (vertex) != dotvertexattrs.end ())
+	  ASSERT_EQ (vertexattrs[vertex], dotvertexattrs[vertex]) << dotgraph << endl;
+      }
+    }
+  }
+}
+
+// Checks that vertex attributes are properly processed by name both in directed
+// and undirected graphs in the presence of paths. The test considers 4
+// attributes per vertex and path length in the range [1, 5].
+// ----------------------------------------------------------------------------
+TEST (Parser, DISABLED_GetVertexAttributesByNamePath)
+{
+
+  vector<string> vertices;
+  map<string, vector<string>> edges;
+  map<string, string> labels;
+  map<string, map<string, string>> vertexattrs;
+  map<string, map<string, map<string, string>>> edgeattrs;
+
+  srand(time(nullptr));  
+
+  for (auto i = 0 ; i < NB_TESTS ; i++) {
+
+    // for paths of length randomly chosen in the range [1, j]
+    for (auto j = 0 ; j < 5 ; j++ ) {
+    
+      // create a dot parser
+      dot::parser parser;
+    
+      // randomly choose a name for this graph
+      string graphname = randString (10);
+
+      // -- undirected graphs
+    
+      // create an undirected graph randomly with the given name
+      string dotgraph {randGraph (0, 10, 0, j, 4, 0, graphname, UNDIRECTED_GRAPH, UNDIRECTED_EDGE, 
+				  vertices, edges, labels, vertexattrs, edgeattrs)};
+
+
+      // parse the graph
+      parser.parse_string (dotgraph);
+
+      // check that the map with all attributes for each vertex are properly
+      // processed
+      for (auto& vertex : vertices) {
+	
+	map<string, string> dotvertexattrs = parser.get_vertex_attributes (vertex);
+
+	// first, verify that both maps are precisely the same
+	ASSERT_EQ (dotvertexattrs, vertexattrs[vertex]) << dotgraph << endl;
+      }
+
+
+      // -- directed graphs
+    
+      // create an undirected graph randomly with the given name
+      dotgraph = randGraph (0, 10, 0, j, 4, 0, graphname, DIRECTED_GRAPH, DIRECTED_EDGE, 
+			    vertices, edges, labels, vertexattrs, edgeattrs);
+
+      // parse the graph
+      dot::parser diparser;
+      diparser.parse_string (dotgraph);
+
+      // check that the map with all attributes for each vertex are properly
+      // processed
+      for (auto& vertex : vertices) {
+	
+	map<string, string> dotvertexattrs = diparser.get_vertex_attributes (vertex);
+
+	// first, verify that both maps are precisely the same
+	ASSERT_EQ (dotvertexattrs, vertexattrs[vertex]) << dotgraph << endl;
+      }
+    }
+  }
+}
+
+// Checks that single vertex attributes are properly processed by name both in
+// directed and undirected graphs in the presence of paths. The test considers 4
+// attributes per vertex and path length in the range [1, 5].
+// ----------------------------------------------------------------------------
+TEST (Parser, DISABLED_GetSingleVertexAttributeByNamePath)
+{
+
+  vector<string> vertices;
+  map<string, vector<string>> edges;
+  map<string, string> labels;
+  map<string, map<string, string>> vertexattrs;
+  map<string, map<string, map<string, string>>> edgeattrs;
+
+  srand(time(nullptr));  
+
+  for (auto i = 0 ; i < NB_TESTS ; i++) {
+
+    // for paths of length randomly chosen in the range [1, j]
+    for (auto j = 0 ; j < 5 ; j++ ) {
+    
+      // create a dot parser
+      dot::parser parser;
+    
+      // randomly choose a name for this graph
+      string graphname = randString (10);
+
+      // -- undirected graphs
+    
+      // create an undirected graph randomly with the given name
+      string dotgraph {randGraph (0, 10, 0, j, 4, 0, graphname, UNDIRECTED_GRAPH, UNDIRECTED_EDGE, 
+				  vertices, edges, labels, vertexattrs, edgeattrs)};
+
+
+      // parse the graph
+      parser.parse_string (dotgraph);
+
+      // check that every single attribute of each vertex has been properly
+      // parsed
+      for (auto& vertex : vertices) {
+	
+	// and now, for each vertex name in this map
+	for (auto& attr : vertexattrs[vertex]) 
+
+	  // verify that the dot parser returns precisely the same value
+	  ASSERT_EQ (parser.get_vertex_attribute (vertex, attr.first), attr.second) << dotgraph << endl;
+      }
+
+      // -- directed graphs
+    
+      // create an undirected graph randomly with the given name
+      dotgraph = randGraph (0, 10, 0, j, 4, 0, graphname, DIRECTED_GRAPH, DIRECTED_EDGE, 
+			    vertices, edges, labels, vertexattrs, edgeattrs);
+
+      // parse the graph
+      dot::parser diparser;
+      diparser.parse_string (dotgraph);
+
+      // check that every single attribute of each vertex has been properly
+      // parsed
+      for (auto& vertex : vertices) {
+	
+	// and now, for each vertex name in this map
+	for (auto& attr : vertexattrs[vertex]) 
+
+	  // verify that the dot parser returns precisely the same value
+	  ASSERT_EQ (diparser.get_vertex_attribute (vertex, attr.first), attr.second) << dotgraph << endl;
+      }
+    }
+  }
+}
+
+// Checks that edge attributes are properly processed both in directed and
+// undirected graphs by querying all of them simultaneously in the presence of
+// paths. The test considers 4 attributes per edge and path length in the
+// range [1, 5].
+// ----------------------------------------------------------------------------
+TEST (Parser, DISABLED_GetAllEdgeAttributesPath)
+{
+
+  srand(time(nullptr));  
+
+  for (auto i = 0 ; i < NB_TESTS ; i++) {
+
+    // for paths of length randomly chosen in the range [1, j]
+    for (auto j = 1 ; j < 5 ; j++) {
+    
+      vector<string> vertices;
+      map<string, vector<string>> edges;
+      map<string, string> labels;
+      map<string, map<string, string>> vertexattrs;
+      map<string, map<string, map<string, string>>> edgeattrs;
+
+      // create a dot parser
+      dot::parser parser;
+    
+      // randomly choose a name for this graph
+      string graphname = randString (10);
+    
+      // -- undirected graphs
+    
+      // create an undirected graph randomly with the given name
+      string dotgraph {randGraph (0, 10, 0, j, 0, 4, graphname, UNDIRECTED_GRAPH, UNDIRECTED_EDGE,
+				  vertices, edges, labels, vertexattrs, edgeattrs)};
+    
+      // parse the graph
+      parser.parse_string (dotgraph);
+    
+      // check first that all edges have been properly processed
+      map<string, vector<string>> dotedges = parser.get_graph ();
+
+      ASSERT_TRUE (equalMaps<string> (edges, dotedges)) << dotgraph << endl;
+    
+      // check also that the map with all attributes for all edges is properly
+      // returned
+      map<string, map<string, map<string, string>>> dotedgeattrs = parser.get_all_edge_attributes ();
+    
+      // first, verify that both maps have precisely the same size
+      ASSERT_EQ (edgeattrs.size (), dotedgeattrs.size ()) << dotgraph << endl;
+
+      // now, ensure also that both maps have the same information for all
+      // edges in the random graph
+      for (auto& edge : edges) {
+      
+	// if this edge is specified in either map, then assert that both maps
+	// have precisely the same information
+	if (edgeattrs.find (edge.first) != edgeattrs.end () ||
+	    dotedgeattrs.find (edge.first) != dotedgeattrs.end ())
+	  ASSERT_EQ (edgeattrs[edge.first], dotedgeattrs[edge.first]) << dotgraph << endl;
+      }
+
+      // -- directed graphs
+    
+      // create a directed graph randomly with the given name
+      dotgraph = randGraph (0, 10, 0, j, 0, 4, graphname, DIRECTED_GRAPH, DIRECTED_EDGE,
+			    vertices, edges, labels, vertexattrs, edgeattrs);
+    
+      // parse the graph
+      dot::parser diparser;
+      diparser.parse_string (dotgraph);
+    
+      // check first that all edges have been properly processed
+      dotedges = diparser.get_graph ();
+      ASSERT_TRUE (equalMaps<string> (edges, dotedges)) << dotgraph << endl;
+    
+      // check also that the map with all attributes for all edges is properly
+      // returned
+      dotedgeattrs = diparser.get_all_edge_attributes ();
+    
+      // first, verify that both maps have precisely the same size
+      ASSERT_EQ (edgeattrs.size (), dotedgeattrs.size ()) << dotgraph << endl;
+
+      // now, ensure also that both maps have the same information for all
+      // edges in the random graph
+      for (auto& edge : edges) {
+      
+	// if this edge is specified in either map, then assert that both maps
+	// have precisely the same information
+	if (edgeattrs.find (edge.first) != edgeattrs.end () ||
+	    dotedgeattrs.find (edge.first) != dotedgeattrs.end ())
+	  ASSERT_EQ (edgeattrs[edge.first], dotedgeattrs[edge.first]) << dotgraph << endl;
+      }
+    }
+  }
+}
+
+// Checks that edge attributes are properly processed by edge, identified with
+// the pair source-target, both in directed and undirected graphs in the
+// presence of paths. The test considers 4 attributes per edge and path length
+// in the range [1, 5].
+// ----------------------------------------------------------------------------
+TEST (Parser, DISABLED_GetEdgeAttributesByNamePath)
+{
+
+  srand(time(nullptr));  
+
+  for (auto i = 0 ; i < NB_TESTS ; i++) {
+
+    // for paths of length randomly chosen in the range [1, j]
+    for (auto j = 0 ; j < 5 ; j++) {
+    
+      vector<string> vertices;
+      map<string, vector<string>> edges;
+      map<string, string> labels;
+      map<string, map<string, string>> vertexattrs;
+      map<string, map<string, map<string, string>>> edgeattrs;
+
+      // create a dot parser
+      dot::parser parser;
+    
+      // randomly choose a name for this graph
+      string graphname = randString (10);
+    
+      // -- undirected graphs
+    
+      // create an undirected graph randomly with the given name
+      string dotgraph {randGraph (0, 10, 0, j, 0, 4, graphname, UNDIRECTED_GRAPH, UNDIRECTED_EDGE,
+				  vertices, edges, labels, vertexattrs, edgeattrs)};
+    
+      // parse the graph
+      parser.parse_string (dotgraph);
+    
+      // now, go over all edges of this graph
+      for (auto& edge : edges) {
+
+	for (auto& target : edge.second) {
+      
+	  // retrieve all the attributes of this edge
+	  map<string, string> dotedgeattrs = parser.get_edge_attributes (edge.first, target);
+	  
+	  // now verify that the attributes of this edge are properly processed
+	  ASSERT_EQ (dotedgeattrs, edgeattrs[edge.first][target]) << dotgraph << endl;
+	}
+      }
+
+      // -- directed graphs
+    
+      // create a directed graph randomly with the given name
+      dotgraph = randGraph (0, 10, 0, j, 0, 4, graphname, DIRECTED_GRAPH, DIRECTED_EDGE,
+			    vertices, edges, labels, vertexattrs, edgeattrs);
+    
+      // parse the graph
+      dot::parser diparser;
+      diparser.parse_string (dotgraph);
+    
+      // now, go over all edges of this graph
+      for (auto& edge : edges) {
+
+	for (auto& target : edge.second) {
+      
+	  // retrieve all the attributes of this edge
+	  map<string, string> dotedgeattrs = diparser.get_edge_attributes (edge.first, target);
+	  
+	  // now verify that the attributes of this edge are properly processed
+	  ASSERT_EQ (dotedgeattrs, edgeattrs[edge.first][target]) << dotgraph << endl;
+	}
+      }
+    }
+  }
+}
+
+// Checks that single edge attributes are properly processed by edge, identified
+// with the pair source-target, both in directed and undirected graphs in the
+// presence of paths. The test considers 4 attributes per edge and path length
+// in the range [1, 5].
+// ----------------------------------------------------------------------------
+TEST (Parser, DISABLED_GetSingleEdgeAttributeByNamePath)
+{
+
+  srand(time(nullptr));  
+
+  for (auto i = 0 ; i < NB_TESTS ; i++) {
+
+    // for paths of length randomly chosen in the range [1, j]
+    for (auto j = 0 ; j < 5 ; j++) {
+    
+      vector<string> vertices;
+      map<string, vector<string>> edges;
+      map<string, string> labels;
+      map<string, map<string, string>> vertexattrs;
+      map<string, map<string, map<string, string>>> edgeattrs;
+
+      // create a dot parser
+      dot::parser parser;
+    
+      // randomly choose a name for this graph
+      string graphname = randString (10);
+    
+      // -- undirected graphs
+    
+      // create an undirected graph randomly with the given name
+      string dotgraph {randGraph (0, 10, 0, j, 0, 4, graphname, UNDIRECTED_GRAPH, UNDIRECTED_EDGE,
+				  vertices, edges, labels, vertexattrs, edgeattrs)};
+    
+      // parse the graph
+      parser.parse_string (dotgraph);
+    
+      // now, go over all edges of this graph
+      for (auto& edge : edges) {
+
+	for (auto& target : edge.second) {
+
+	  // and now over all attributes of this edge
+	  for (auto& attr : edgeattrs[edge.first][target]) {
+	  
+	    // retrieve all the attributes of this edge
+	    string dotedgeattr = parser.get_edge_attribute (edge.first, target, attr.first);
+	  
+	    // now verify that the value of this attribute of this edge has been
+	    // properly processed
+	    ASSERT_EQ (dotedgeattr, attr.second) << dotgraph << endl;
+	  }
+	}
+      }
+
+      // -- directed graphs
+    
+      // create a directed graph randomly with the given name
+      dotgraph = randGraph (0, 10, 0, j, 0, 4, graphname, DIRECTED_GRAPH, DIRECTED_EDGE,
 			    vertices, edges, labels, vertexattrs, edgeattrs);
     
       // parse the graph
