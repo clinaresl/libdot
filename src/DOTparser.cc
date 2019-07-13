@@ -272,6 +272,11 @@ bool dot::parser::_process_multiple_vertices (string& contents, const string& or
 	    if (find (_graph[target_name].begin (), _graph[target_name].end (),
 		      orig_name) == _graph[target_name].end ())
 	      _graph[target_name].push_back (orig_name);
+
+	  // and do not forget to add the target vertex to the graph even if it
+	  // has no neighbours
+	  if (edge_type == "->" && _graph.find (target_name) == _graph.end ()) 
+	    _graph[target_name] = vector<string>();
     
 	  // process now the edge attributes given to this vertex and, if given,
 	  // the attributes of the target vertex as well
@@ -282,7 +287,7 @@ bool dot::parser::_process_multiple_vertices (string& contents, const string& or
     show_void (" --- Ending multiple target specification ---", _verbose);
   }
   else
-    throw dot::syntax_error ("TARGET_NAME could not be parsed");
+    throw dot::syntax_error ("a block with a declaration of multiple vertices could not be parsed");
 
   return true;
 }
@@ -295,19 +300,34 @@ bool dot::parser::_process_trajectory (string& contents, string& orig_name)
 
   string edge_type;
   string target_name;
+
+  // in case a block with multiple vertices is found, it is necessary to enable
+  // the following flag to ensure that no edges follow it
+  bool block_found = false;
   
   // while an edge is found in contents
   while (_read_string (contents, EDGE_TYPE, edge_type, "EDGE TYPE")) {
 
-    map<string, string> nestedarcdict;
+    // first of all, if an edge follows a block with multiple vertices then a
+    // syntax error should be raised
+    if (block_found)
+      throw dot::syntax_error ("an edge was found immediately after a block with multiple vertices");
 	  
     // yeah! A path is listed, parse the attributes of this edge if any were
     // given
+    map<string, string> nestedarcdict;
     _process_attributes (contents, nestedarcdict);
 
     // get the target vertex of this specific edge
-    if (!_read_string (contents, VERTEX_NAME, target_name, "TARGET VERTEX"))
-      throw dot::syntax_error ("a VERTEX_NAME could not be found while parsing a path");
+    if (!_read_string (contents, VERTEX_NAME, target_name, "TARGET VERTEX")) {
+
+      // if a target vertex could not be retrieved, then the only option is that
+      // a block with multiple vertices is declared, but we should make sure
+      // that this is the last part of the statement so that no edges can follow
+      // it
+      _process_multiple_vertices (contents, orig_name, edge_type, nestedarcdict);
+      block_found = true;
+    }
     else {
 
       // make sure this target vertex was not processed before
@@ -318,6 +338,11 @@ bool dot::parser::_process_trajectory (string& contents, string& orig_name)
 	if (find (_graph[target_name].begin (), _graph[target_name].end (),
 		  orig_name) == _graph[target_name].end ())
 	  _graph[target_name].push_back (orig_name);
+      
+      // and do not forget to add the target vertex to the graph even if it
+      // has no neighbours
+      if (edge_type == "->" && _graph.find (target_name) == _graph.end ()) 
+	_graph[target_name] = vector<string>();
       
       // and update all the edge attributes of this edge and also the attributes
       // of the target vertex if any were given
@@ -374,7 +399,25 @@ std::vector<std::string> dot::parser::get_vertices () const
 // the value is a vector of target vertices.
 std::map<std::string, std::vector<std::string>> dot::parser::get_graph () const
 {
-  return _graph;
+
+  // vertices are directly returned by traversing the data member _graph which
+  // is indexed by vertices. In the case of digraphs, it might be the case that
+  // u->v is present in the graph but v is not the source vertex of any edge. If
+  // u->v is found in the DOT specification, then v is added to the graph with
+  // no neighbours but we should not return an edge from v to no
+  // neighbours. Thus, it is necessary to traverse the entire graph to return
+  // only meaningful edges
+  map<string, vector<string>> graph;
+
+  // for all vertices in the graph
+  for (auto& vertex : _graph)
+
+    // if and only if this vertex has neighbours
+    if (vertex.second.size () > 0)
+      graph [vertex.first] = vertex.second;
+
+  // and return the graph with meaningful edges
+  return graph;
 }
 
 // get all nodes that are reachable from a given node. In case no node is
@@ -595,6 +638,11 @@ bool dot::parser::parse_string (string contents)
 	  if (find (_graph[target_name].begin (), _graph[target_name].end (),
 		    orig_name) == _graph[target_name].end ())
 	    _graph[target_name].push_back (orig_name);
+
+	// and do not forget to add the target vertex to the graph even if it
+	// has no neighbours
+	if (edge_type == "->" && _graph.find (target_name) == _graph.end ()) 
+	  _graph[target_name] = vector<string>();
 	
 	// process now the edge attributes given to this vertex and, if given,
 	// the attributes of the target vertex as well
@@ -627,7 +675,7 @@ bool dot::parser::parse ()
   // read the file
   string contents;
   if (!_read_file (contents))
-    throw invalid_argument ("It was not possible to read the contents of the dot file: " + _filename);
+    throw invalid_argument ("file not found '" + _filename + "'");
 
   // and now parse its contents
   return parse_string (contents);

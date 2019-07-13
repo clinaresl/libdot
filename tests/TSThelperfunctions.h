@@ -122,6 +122,26 @@ string generateDotVertex (const string& name, map<string, string>& attrs,
 string generateDotEdge (const int edge_spec, map<string, string>& attrs,
 			map<string, string>& used_attrs);
 
+// returns the declaration of a vertex in the DOT language. The vertex is
+// randomly chosen among those in vertices and its name is returned in name.
+//
+// The vertex might be decorated with attributes among those in
+// vertexselectedattrs. Those effecitvely used are returned in vertexattrs.
+string randVertex (vector<string>& vertices, string& name,
+		   map<string, map<string, string>>& vertexselectedattrs,
+		   map<string, map<string, string>>& vertexattrs);
+
+// generate precisely nbvertices vertices each with a random number of
+// attributes in the range [0, nbattrs] which are returned in the map
+// attributes. The name of the vertices randomly generated are returned in
+// vertices.
+//
+// note that this function does not return a dot specification. Indeed, the
+// method generateDotVertex should be used instead to do the job
+void randVertices (int nbvertices, int nbattrs,
+		   vector<string>& vertices,
+		   map<string, map<string, string>>& attributes);
+
 // generate up to nbnodestmts node statements randomly chosen among the vector
 // of vertices and returns the specification in the DOT language as a vector of
 // strings, each one with the specification of a single node statement. Each
@@ -138,29 +158,26 @@ vector<string> randNodeStatements (int nbnodestmts, vector<string>& vertices,
 				   map<string, map<string, string>>& vertexattrs,
 				   map<string, vector<string>>& edges);
 
-// generate precisely nbvertices vertices each with a random number of
-// attributes in the range [0, nbattrs] which are returned in the map
-// attributes. The name of the vertices randomly generated are returned in
-// vertices.
+// return the declaration of a block with multiple vertices in the DOT
+// language. The number of vertices included is drawn from a uniform
+// distribution in the range [1, nbmultiplenodes] and they are randomly selected
+// from the given collection of vertices. Each one is decorated with attributes
+// randomly selected from vertexselectedattrs.
 //
-// note that this function does not return a dot specification. Indeed, the
-// method generateDotVertex should be used instead to do the job
-void randVertices (int nbvertices, int nbattrs,
-		   vector<string>& vertices,
-		   map<string, map<string, string>>& attributes);
-
-// returns the declaration of a vertex in the DOT language. The vertex is
-// randomly chosen among those in vertices and its name is returned in name.
-//
-// The vertex might be decorated with attributes among those in
-// vertexselectedattrs. Those effecitvely used are returned in vertexattrs.
-string randVertex (vector<string>& vertices, string& name,
-		   map<string, map<string, string>>& vertexselectedattrs,
-		   map<string, map<string, string>>& vertexattrs);
+// The vertices effectively chosen are returned in targets, and are added to
+// used_vertices; the attributes selected are returned in the map vertexattrs.
+string randMultipleVertices (int nbmultiplenodes,
+			     vector<string>& vertices,
+			     map<string, map<string, string>>& vertexselectedattrs,
+			     vector<string>& target, 
+			     set<string>& used_vertices,
+			     map<string, map<string, string>>& vertexattrs);
 
 // generate a path of the given length in the DOT language, where the path
 // length is measured as the number of edges and should be strictly greater or
-// equal than one.
+// equal than one. The path is terminated with a block with multiple vertices
+// with probability p/100 and it contains a number of nodes randomly chosen in
+// the interval [1, nbmultiplenodes].
 //
 // The path generated starts with an edge of the specified type which can be
 // either undirected (edge_spec=UNDIRECTED_EDGE), directed
@@ -177,7 +194,7 @@ string randVertex (vector<string>& vertices, string& name,
 // used_vertices: contains the vertices randomly selected in the final graph
 // vertexattrs: vertex attributes finally chosen in the final graph
 // edgeattrs: edge attributes finally chosen in the final graph
-string randPath (int pathlength, int edge_spec,
+string randPath (int pathlength, int p, int nbmultiplenodes, int edge_spec,
 		 vector<string>& vertices,
 		 map<string, vector<string>>& edges,
 		 map<string, map<string, string>>& vertexselectedattrs,
@@ -188,27 +205,37 @@ string randPath (int pathlength, int edge_spec,
 
 // Generate a vector of strings, each one with the declaration of a path with a
 // length randomly chosen in the interval [1, pathlength] or a single node
-// statement. It generates precisely nbnodestmts node statements and nbedges
-// edges which are either undirected (edge_spec=UNDIRECTED_EDGE), directed
-// (edge_spec=DIRECTED_EDGE) or undirected/directed (edge_spec=MIX_EDGE). Each
-// vertex has a random number of attributes randomly chosen in the interval [0,
-// nbvertexattrs]. Likewise, each edge has a random number of attributes
-// randomly chosen in the interval [0, nbedgeattrs].
+// statement. The path is terminated with a block with multiple vertices with
+// probability p/100 and it contains a number of nodes randomly chosen in the
+// interval [1, nbmultiplenodes]. In addition, it generates precisely
+// nbnodestmts node statements.
+//
+// Each path contains precisely nbedges edges which are either undirected
+// (edge_spec=UNDIRECTED_EDGE), directed (edge_spec=DIRECTED_EDGE) or
+// undirected/directed (edge_spec=MIX_EDGE). Each vertex has a random number of
+// attributes randomly chosen in the interval [0, nbvertexattrs]. Likewise, each
+// edge has a random number of attributes randomly chosen in the interval [0,
+// nbedgeattrs].
 //
 // The collection of random source vertices and edges are returned in dedicated
 // vars. In addition, the vertex attributes of all vertices randomly chosen
 // (either those appearing in edges or as node statements) and the edges
 // attributes are also returned in a dedicated container.
-vector<string> randEdges (int nbnodestmts, int nbedges, int pathlength,
-			  int nbvertexattrs, int nbedgeattrs, int edge_spec,
-			  vector<string>& vertices, map<string, vector<string>>& edges,
-			  map<string, map<string, string>>& vertexattrs,
-			  map<string, map<string, map<string, string>>>& edgeattrs);
+vector<string> randStatements (int nbnodestmts, int nbedges, int pathlength,
+			       int p, int nbmultiplenodes, 
+			       int nbvertexattrs, int nbedgeattrs, int edge_spec,
+			       vector<string>& vertices, map<string, vector<string>>& edges,
+			       map<string, map<string, string>>& vertexattrs,
+			       map<string, map<string, map<string, string>>>& edgeattrs);
   
 // Generate a random graph with precisely nbnodestmts node statements, nbedges
 // edge statements defined over nbedges/2 vertices, each one with a random
 // length between 1 and pathlength, and nblabels labels named after
-// graph_name. It returns the textual definition of the graph in the DOT
+// graph_name. Each path is terminated with a block with multiple vertices with
+// probability p/100 and it contains a number of nodes randomly chosen in the
+// interval [1, nbmultiplenodes]. 
+//
+// It returns the textual definition of the graph in the DOT
 // language. Each vertex has a random number of attributes randomly chosen in
 // the interval [0, nbvertexattrs]. Likewise, each edge has a random number of
 // attributes randomly chosen in the interval [0, nbedgeattrs].
@@ -222,7 +249,7 @@ vector<string> randEdges (int nbnodestmts, int nbedges, int pathlength,
 // graph_spec=DIRECTED_GRAPH. The type of edges is determined by edge_spec: they
 // are all undirected if edge_spec=UNDIRECTED_EDGE, directed if
 // edge_spec=DIRECTED_EDGE and a mixture if edge_spec=MIX_EDGE.
-string randGraph (int nbnodestmts, int nbedges, int nblabels, int pathlength,
+string randGraph (int nbnodestmts, int p, int nbmultiplenodes, int nbedges, int nblabels, int pathlength,
 		  int nbvertexattrs, int nbedgeattrs, 
 		  const string graph_name,
 		  int graph_spec, int edge_spec, 

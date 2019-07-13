@@ -268,55 +268,33 @@ string generateDotEdge (const int edge_spec, map<string, string>& attrs,
   return result;
 }
 
-// generate up to nbnodestmts node statements randomly chosen among the vector
-// of vertices and returns the specification in the DOT language as a vector of
-// strings, each one with the specification of a single node statement. Each
-// vertex can be decorated with vertex attributes which are randomly chosen
-// among those in vertexselectedattrs.
+// returns the declaration of a vertex in the DOT language. The vertex is
+// randomly chosen among those in vertices and its name is returned in name.
 //
-// The vertices selected are returned in used_vertices, and the vertex
-// attributes randomly picked up are returned in vertexattrs
-vector<string> randNodeStatements (int nbnodestmts, vector<string>& vertices,
-				   map<string, map<string, string>>& vertexselectedattrs,
-				   set<string>& used_vertices,
-				   map<string, map<string, string>>& vertexattrs,
-				   map<string, vector<string>>& edges)
+// The vertex might be decorated with attributes among those in
+// vertexselectedattrs. Those effecitvely used are returned in vertexattrs.
+string randVertex (vector<string>& vertices, string& name,
+		   map<string, map<string, string>>& vertexselectedattrs,
+		   map<string, map<string, string>>& vertexattrs)
 {
 
-  vector<string> result;
+  map<string, string> vertexusedattrs;
   
-  // create nbnodestmts node statements
-  for (auto i = 0 ; i < nbnodestmts ; i++) {
+  // choose randomly a vertex and annotate its name
+  int vertexid = rand () % (vertices.size ());
+  name = vertices[vertexid];
+  
+  // start the declaration of the edge with the source vertex
+  string dotvertex = generateDotVertex (name, vertexselectedattrs[name],
+					vertexusedattrs);
+  
+  // now, add the collection of vertex attributes effectively chosen to the
+  // collection of vertex attributes to return
+  if (vertexusedattrs.size ())
+    vertexattrs[name].merge (vertexusedattrs);
 
-    string output;
-    map<string, string> vertexusedattrs;  // attrs randomly chosen for a vertex
-    
-    // choose a source vertex and add it to the collection of used vertices
-    // unless it has been already inserted
-    int sourceid = rand () % (vertices.size ());
-    used_vertices.insert (vertices[sourceid]);
-
-    // add the vertex in the DOT language
-    string source = generateDotVertex (vertices[sourceid], vertexselectedattrs[vertices[sourceid]],
-				       vertexusedattrs);
-    output += "\t" + source + ";";
-
-    // update the collection of edges in the final graph by adding this vertex
-    // with no neighbours
-    if (edges.find (vertices[sourceid]) == edges.end ())
-      edges[vertices[sourceid]] = vector<string>();
-
-    // now, add the collection of vertex attributes effectively chosen to the
-    // collection of vertex attributes to return
-    if (vertexusedattrs.size ())
-      vertexattrs[vertices[sourceid]].merge (vertexusedattrs);
-
-    // and add it to the vector of edges in dot format
-    result.push_back (output);
-  }
-
-  // and return all the node statements
-  return result;
+  // and return the dot string
+  return dotvertex;
 }
 
 // generate precisely nbvertices vertices each with a random number of
@@ -355,38 +333,109 @@ void randVertices (int nbvertices, int nbattrs,
   }
 }
 
-// returns the declaration of a vertex in the DOT language. The vertex is
-// randomly chosen among those in vertices and its name is returned in name.
+// generate up to nbnodestmts node statements randomly chosen among the vector
+// of vertices and returns the specification in the DOT language as a vector of
+// strings, each one with the specification of a single node statement. Each
+// vertex can be decorated with vertex attributes which are randomly chosen
+// among those in vertexselectedattrs.
 //
-// The vertex might be decorated with attributes among those in
-// vertexselectedattrs. Those effecitvely used are returned in vertexattrs.
-string randVertex (vector<string>& vertices, string& name,
-		   map<string, map<string, string>>& vertexselectedattrs,
-		   map<string, map<string, string>>& vertexattrs)
+// The vertices selected are returned in used_vertices, and the vertex
+// attributes randomly picked up are returned in vertexattrs
+vector<string> randNodeStatements (int nbnodestmts, vector<string>& vertices,
+				   map<string, map<string, string>>& vertexselectedattrs,
+				   set<string>& used_vertices,
+				   map<string, map<string, string>>& vertexattrs,
+				   map<string, vector<string>>& edges)
 {
 
-  map<string, string> vertexusedattrs;
+  vector<string> result;
   
-  // choose randomly a vertex and annotate its name
-  int vertexid = rand () % (vertices.size ());
-  name = vertices[vertexid];
-  
-  // start the declaration of the edge with the source vertex
-  string dotvertex = generateDotVertex (name, vertexselectedattrs[name],
-					vertexusedattrs);
-  
-  // now, add the collection of vertex attributes effectively chosen to the
-  // collection of vertex attributes to return
-  if (vertexusedattrs.size ())
-    vertexattrs[name].merge (vertexusedattrs);
+  // create nbnodestmts node statements
+  for (auto i = 0 ; i < nbnodestmts ; i++) {
 
-  // and return the dot string
-  return dotvertex;
+    string output;
+    map<string, string> vertexusedattrs;  // attrs randomly chosen for a vertex
+    
+    // add a source vertex in the DOT language and add it to the collection of
+    // used vertices unless it has been already inserted
+    string name;
+    output += "\t" + randVertex (vertices, name, vertexselectedattrs, vertexattrs) + ";";
+    used_vertices.insert (name);
+    
+    // update the collection of edges in the final graph by adding this vertex
+    // with no neighbours
+    if (edges.find (name) == edges.end ())
+      edges[name] = vector<string>();
+
+    // and add it to the vector of edges in dot format
+    result.push_back (output);
+  }
+
+  // and return all the node statements
+  return result;
+}
+
+// return the declaration of a block with multiple vertices in the DOT
+// language. The number of vertices included is drawn from a uniform
+// distribution in the range [1, nbmultiplenodes] and they are randomly selected
+// from the given collection of vertices. Each one is decorated with attributes
+// randomly selected from vertexselectedattrs.
+//
+// The vertices effectively chosen are returned in targets, and are added to
+// used_vertices; the attributes selected are returned in the map vertexattrs.
+string randMultipleVertices (int nbmultiplenodes,
+			     vector<string>& vertices,
+			     map<string, map<string, string>>& vertexselectedattrs,
+			     vector<string>& target, 
+			     set<string>& used_vertices,
+			     map<string, map<string, string>>& vertexattrs)
+{
+
+  string output;
+
+  // make sure the vector of vertices randomly chosen is initially empty
+  target.clear ();
+  
+  // decide the number of vertices to add in the block
+  int nbnodes;
+  if (nbmultiplenodes <= 1)
+    nbnodes = 1;
+  else
+    nbnodes = 1 + rand () % nbmultiplenodes;
+
+  // and create the block which should be embraced between curly brackets
+  output = "{";
+  for (auto i = 0 ; i < nbnodes ; i++) {
+
+    string name;
+    
+    // separate all fields with a random number of blanks
+    for (auto k = 0 ; k <= rand () % 5 ; output+= " ", k++);
+
+    // create the vertex randomly along with its attributes
+    output += randVertex (vertices, name, vertexselectedattrs, vertexattrs);
+
+    // and add it to the vector of vertices randomly chosen
+    target.push_back (name);
+
+    // and add it to the collection of vertices actually used if it was not
+    // inserted yet
+    used_vertices.insert (name);
+  }
+
+  // and now close the block after inserting a random number of blanks
+  for (auto k = 0 ; k < rand () % 5 ; output+= " ", k++);
+  output += "}";
+
+  // and return the string
+  return output;
 }
 
 // generate a path of the given length in the DOT language, where the path
 // length is measured as the number of edges and should be strictly greater or
-// equal than one.
+// equal than one. The path is terminated with a block with multiple vertices
+// with probability p/100 and it contains a number of nodes randomly chosen in
+// the interval [1, nbmultiplenodes].
 //
 // The path generated starts with an edge of the specified type which can be
 // either undirected (edge_spec=UNDIRECTED_EDGE), directed
@@ -403,7 +452,7 @@ string randVertex (vector<string>& vertices, string& name,
 // used_vertices: contains the vertices randomly selected in the final graph
 // vertexattrs: vertex attributes finally chosen in the final graph
 // edgeattrs: edge attributes finally chosen in the final graph
-string randPath (int pathlength, int edge_spec,
+string randPath (int pathlength, int p, int nbmultiplenodes, int edge_spec,
 		 vector<string>& vertices,
 		 map<string, vector<string>>& edges,
 		 map<string, map<string, string>>& vertexselectedattrs,
@@ -430,6 +479,9 @@ string randPath (int pathlength, int edge_spec,
   // has been already written
   for (auto nbedges = 0 ; nbedges < pathlength ; nbedges++) {
   
+    vector<string> targets;                   // vector of targets of this edge
+    targets.clear ();
+    
     // Secondly, decide the type of edge
     int edge_type;
     if (edge_spec == MIX_EDGE) {
@@ -444,38 +496,59 @@ string randPath (int pathlength, int edge_spec,
     // and then add it along with its attributes if any has been requested
     output += " " + generateDotEdge (edge_type, edgeselectedattrs, edgeusedattrs);
 
-    // target vertex
-    output += " " + randVertex (vertices, target, vertexselectedattrs, vertexattrs);
+    // target vertex - if this is the last vertex to add, then decide whether a
+    // multiple vertex block should be used instead
+    if ( (nbedges == pathlength - 1) && (rand () % 100 < p)) {
 
-    // now that the target vertex is known, add also the edge attributes to the
-    // edge ---in both directions if required
-    if (edgeusedattrs.size ()) {
-      map<string, string> edgemergedattrs {edgeusedattrs};
-      edgeattrs [source][target].merge (edgeusedattrs);
-
-      edgeusedattrs = edgemergedattrs;
-      if (edge_type == UNDIRECTED_EDGE)
-	edgeattrs [target][source].merge (edgeusedattrs);
+      // with a probability of p among 100 create a block with a declaration
+      // of multiple vertices
+      output += " " + randMultipleVertices (nbmultiplenodes, vertices, vertexselectedattrs,
+					    targets, used_vertices, vertexattrs);
     }
+    else {
+
+      // with a probability of (100-p) among 100 create a target which is a
+      // single vertex
+      output += " " + randVertex (vertices, target, vertexselectedattrs, vertexattrs);
+
+      // and update the container of target vertices to contain only this one
+      targets.push_back (target);
+    }
+
+    // now process all edges, from the source vertex to all vertices in targets
+
+    for (auto& itarget : targets) {
+      
+      // now that the target vertex is known, add also the edge attributes to the
+      // edge ---in both directions if required
+      if (edgeusedattrs.size ()) {
+	map<string, string> edgemergedattrs {edgeusedattrs};
+	edgeattrs [source][itarget].merge (edgeusedattrs);
+
+	edgeusedattrs = edgemergedattrs;
+	if (edge_type == UNDIRECTED_EDGE)
+	  edgeattrs [itarget][source].merge (edgeusedattrs);
+      }
     
-    // update the collection of edges in the final graph. Note that it is possible
-    // that the same edge is repeated in the graph so that we verify first that
-    // the new edge has not been recorded before.
-    if (find (edges[source].begin (), edges[source].end (),
-	      target) == edges[source].end ())
-      edges[source].push_back (target);
+      // update the collection of edges in the final graph. Note that it is possible
+      // that the same edge is repeated in the graph so that we verify first that
+      // the new edge has not been recorded before.
+      if (find (edges[source].begin (), edges[source].end (),
+		itarget) == edges[source].end ())
+	edges[source].push_back (itarget);
 
-    // if this is an undirected edge then the same operation should be performed
-    // in the opposite direction
-    if (edge_type == UNDIRECTED_EDGE) {
+      // if this is an undirected edge then the same operation should be performed
+      // in the opposite direction
+      if (edge_type == UNDIRECTED_EDGE) {
 
-      if (find (edges[target].begin (), edges[target].end (),
-		source) == edges[target].end ())
-	edges[target].push_back (source);
+	if (find (edges[itarget].begin (), edges[itarget].end (),
+		  source) == edges[itarget].end ())
+	  edges[itarget].push_back (source);
+      }
 
-      // in addition, the target vertex is used also as a source vertex, so
-      // annotate it unless it has been already inserted
-      used_vertices.insert (target);
+      // in any case, the target vertex is used also (even if it has no
+      // neighbours), so annotate it unless it has been already inserted
+      used_vertices.insert (itarget);
     }
 
     // and now update the source vertex to be the target vertex of the previous
@@ -492,22 +565,28 @@ string randPath (int pathlength, int edge_spec,
 
 // Generate a vector of strings, each one with the declaration of a path with a
 // length randomly chosen in the interval [1, pathlength] or a single node
-// statement. It generates precisely nbnodestmts node statements and nbedges
-// edges which are either undirected (edge_spec=UNDIRECTED_EDGE), directed
-// (edge_spec=DIRECTED_EDGE) or undirected/directed (edge_spec=MIX_EDGE). Each
-// vertex has a random number of attributes randomly chosen in the interval [0,
-// nbvertexattrs]. Likewise, each edge has a random number of attributes
-// randomly chosen in the interval [0, nbedgeattrs].
+// statement. The path is terminated with a block with multiple vertices with
+// probability p/100 and it contains a number of nodes randomly chosen in the
+// interval [1, nbmultiplenodes]. In addition, it generates precisely
+// nbnodestmts node statements.
+//
+// Each path contains precisely nbedges edges which are either undirected
+// (edge_spec=UNDIRECTED_EDGE), directed (edge_spec=DIRECTED_EDGE) or
+// undirected/directed (edge_spec=MIX_EDGE). Each vertex has a random number of
+// attributes randomly chosen in the interval [0, nbvertexattrs]. Likewise, each
+// edge has a random number of attributes randomly chosen in the interval [0,
+// nbedgeattrs].
 //
 // The collection of random source vertices and edges are returned in dedicated
 // vars. In addition, the vertex attributes of all vertices randomly chosen
 // (either those appearing in edges or as node statements) and the edges
 // attributes are also returned in a dedicated container.
-vector<string> randEdges (int nbnodestmts, int nbedges, int pathlength,
-			  int nbvertexattrs, int nbedgeattrs, int edge_spec,
-			  vector<string>& vertices, map<string, vector<string>>& edges,
-			  map<string, map<string, string>>& vertexattrs,
-			  map<string, map<string, map<string, string>>>& edgeattrs)
+vector<string> randStatements (int nbnodestmts, int nbedges, int pathlength,
+			       int p, int nbmultiplenodes, 
+			       int nbvertexattrs, int nbedgeattrs, int edge_spec,
+			       vector<string>& vertices, map<string, vector<string>>& edges,
+			       map<string, map<string, string>>& vertexattrs,
+			       map<string, map<string, map<string, string>>>& edgeattrs)
 {
   vector<string> result;
   set<string> used_vertices;
@@ -526,9 +605,9 @@ vector<string> randEdges (int nbnodestmts, int nbedges, int pathlength,
 
   // now, create exactly n/2 different vertices. Bear in mind however that maybe
   // not all of them are used since they are randomly chosen. Note that the
-  // vertices randomly created are returned in vertices and randEdges should
-  // return in the same vector those that are actually used. For this we use a
-  // set, used_vertices
+  // vertices randomly created are returned in vertices and randStatements
+  // should return in the same vector those that are actually used. For this we
+  // use a set, used_vertices
   randVertices (nbedges/2, nbvertexattrs, vertices, vertexselectedattrs);
 
   // create the node statements
@@ -550,7 +629,7 @@ vector<string> randEdges (int nbnodestmts, int nbedges, int pathlength,
       randlength = 0;
     else
       randlength = 1 + rand () % pathlength;
-    output += randPath (randlength, edge_spec, vertices, edges,
+    output += randPath (randlength, p, nbmultiplenodes, edge_spec, vertices, edges,
 			vertexselectedattrs, edgeselectedattrs,
 			used_vertices, vertexattrs, edgeattrs);
     
@@ -569,7 +648,11 @@ vector<string> randEdges (int nbnodestmts, int nbedges, int pathlength,
 // Generate a random graph with precisely nbnodestmts node statements, nbedges
 // edge statements defined over nbedges/2 vertices, each one with a random
 // length between 1 and pathlength, and nblabels labels named after
-// graph_name. It returns the textual definition of the graph in the DOT
+// graph_name. Each path is terminated with a block with multiple vertices with
+// probability p/100 and it contains a number of nodes randomly chosen in the
+// interval [1, nbmultiplenodes]. 
+//
+// It returns the textual definition of the graph in the DOT
 // language. Each vertex has a random number of attributes randomly chosen in
 // the interval [0, nbvertexattrs]. Likewise, each edge has a random number of
 // attributes randomly chosen in the interval [0, nbedgeattrs].
@@ -583,7 +666,7 @@ vector<string> randEdges (int nbnodestmts, int nbedges, int pathlength,
 // graph_spec=DIRECTED_GRAPH. The type of edges is determined by edge_spec: they
 // are all undirected if edge_spec=UNDIRECTED_EDGE, directed if
 // edge_spec=DIRECTED_EDGE and a mixture if edge_spec=MIX_EDGE.
-string randGraph (int nbnodestmts, int nbedges, int nblabels, int pathlength, 
+string randGraph (int nbnodestmts, int p, int nbmultiplenodes, int nbedges, int nblabels, int pathlength, 
 		  int nbvertexattrs, int nbedgeattrs, 
 		  const string graph_name,
 		  int graph_spec, int edge_spec, 
@@ -611,10 +694,11 @@ string randGraph (int nbnodestmts, int nbedges, int nblabels, int pathlength,
   output += graph_name + " ";
 
   // generate the edges and add them all to the body
-  vector<string> body = randEdges (nbnodestmts, nbedges, pathlength, 
-				   nbvertexattrs, nbedgeattrs, edge_spec,
-				   vertices, edges,
-				   vertexattrs, edgeattrs);
+  vector<string> body = randStatements (nbnodestmts, nbedges, pathlength,
+					p, nbmultiplenodes, 
+					nbvertexattrs, nbedgeattrs, edge_spec,
+					vertices, edges,
+					vertexattrs, edgeattrs);
 
   // generate also the labels and add them to the body as well
   vector<string> labellines = randLabels (nblabels, labels);
