@@ -362,11 +362,6 @@ vector<string> randNodeStatements (int nbnodestmts, vector<string>& vertices,
     output += "\t" + randVertex (vertices, name, vertexselectedattrs, vertexattrs) + ";";
     used_vertices.insert (name);
     
-    // update the collection of edges in the final graph by adding this vertex
-    // with no neighbours
-    if (edges.find (name) == edges.end ())
-      edges[name] = vector<string>();
-
     // and add it to the vector of edges in dot format
     result.push_back (output);
   }
