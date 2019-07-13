@@ -200,7 +200,7 @@ TEST (Parser, DISABLED_GetTypeAnonymousGraph)
 
     // -- directed graphs
     
-    // create an undirected anonymous graph randomly
+    // create a directed anonymous graph randomly
     dotgraph = randGraph (0, 0, 0, 10, 0, 1, 0, 0, "", DIRECTED_GRAPH, DIRECTED_EDGE,
 			  vertices, edges, labels, vertexattrs, edgeattrs);
 
@@ -393,7 +393,7 @@ TEST (Parser, DISABLED_GetVerticesPlainNamedGraph)
 
     // -- directed graphs
     
-    // create an undirected graph randomly with the given name
+    // create a directed graph randomly with the given name
     dotgraph = randGraph (0, 0, 0, 10, 0, 1, 0, 0, graphname, DIRECTED_GRAPH, DIRECTED_EDGE,
     			  vertices, edges, labels, vertexattrs, edgeattrs);
 
@@ -447,7 +447,7 @@ TEST (Parser, DISABLED_GetEdgesPlainNamedGraph)
 
     // -- directed graphs
     
-    // create an undirected graph randomly with the given name
+    // create a directed graph randomly with the given name
     dotgraph = randGraph (0, 0, 0, 10, 0, 1, 0, 0, graphname, DIRECTED_GRAPH, DIRECTED_EDGE, 
 			  vertices, edges, labels, vertexattrs, edgeattrs);
 
@@ -706,7 +706,7 @@ TEST (Parser, DISABLED_GetVertexAttributesByName)
 
       // -- directed graphs
     
-      // create an undirected graph randomly with the given name
+      // create a directed graph randomly with the given name
       dotgraph = randGraph (0, 0, 0, 10, 0, 1, j, 0, graphname, DIRECTED_GRAPH, DIRECTED_EDGE,
 			    vertices, edges, labels, vertexattrs, edgeattrs);
 
@@ -775,7 +775,7 @@ TEST (Parser, DISABLED_GetSingleVertexAttributeByName)
 
       // -- directed graphs
     
-      // create an undirected graph randomly with the given name
+      // create a directed graph randomly with the given name
       dotgraph = randGraph (0, 0, 0, 10, 0, 1, j, 0, graphname, DIRECTED_GRAPH, DIRECTED_EDGE,
 			    vertices, edges, labels, vertexattrs, edgeattrs);
 
@@ -1204,7 +1204,7 @@ TEST (Parser, DISABLED_GetAllVertexAttributesPath)
 
       // -- directed graphs
     
-      // create an undirected graph randomly with the given name
+      // create a directed graph randomly with the given name
       dotgraph = randGraph (0, 0, 0, 10, 0, j, 4, 0, graphname, DIRECTED_GRAPH, DIRECTED_EDGE, 
 			    vertices, edges, labels, vertexattrs, edgeattrs);
 
@@ -1291,7 +1291,7 @@ TEST (Parser, DISABLED_GetVertexAttributesByNamePath)
 
       // -- directed graphs
     
-      // create an undirected graph randomly with the given name
+      // create a directed graph randomly with the given name
       dotgraph = randGraph (0, 0, 0, 10, 0, j, 4, 0, graphname, DIRECTED_GRAPH, DIRECTED_EDGE, 
 			    vertices, edges, labels, vertexattrs, edgeattrs);
 
@@ -1370,7 +1370,7 @@ TEST (Parser, DISABLED_GetSingleVertexAttributeByNamePath)
 
       // -- directed graphs
     
-      // create an undirected graph randomly with the given name
+      // create a directed graph randomly with the given name
       dotgraph = randGraph (0, 0, 0, 10, 0, j, 4, 0, graphname, DIRECTED_GRAPH, DIRECTED_EDGE, 
 			    vertices, edges, labels, vertexattrs, edgeattrs);
 
@@ -1708,14 +1708,9 @@ TEST (Parser, DISABLED_GetVerticesBlockMultipleVertices)
 	  ASSERT_EQ (vertexattrs[vertex], dotvertexattrs[vertex]) << dotgraph << endl;
       }
 
-      // finally, check the list of edges retrieved from the parser is equal to
-      // the list of edges randomly generated
-      map<string, vector<string>> dotedges = parser.get_graph ();
-      ASSERT_TRUE (equalMaps<string> (edges, dotedges)) << dotgraph << endl;
-
       // -- directed graphs
     
-      // create an undirected graph randomly with the given name
+      // create a directed graph randomly with the given name
       dotgraph = randGraph (0, 100, j, 10, 0, 1, 4, 0, graphname, DIRECTED_GRAPH, DIRECTED_EDGE,
 			    vertices, edges, labels, vertexattrs, edgeattrs);
 
@@ -1744,11 +1739,6 @@ TEST (Parser, DISABLED_GetVerticesBlockMultipleVertices)
 	    dotvertexattrs.find (vertex) != dotvertexattrs.end ())
 	  ASSERT_EQ (vertexattrs[vertex], dotvertexattrs[vertex]) << dotgraph << endl;
       }
-
-      // finally, check the list of edges retrieved from the parser is equal to
-      // the list of edges randomly generated
-      dotedges = diparser.get_graph ();
-      ASSERT_TRUE (equalMaps<string> (edges, dotedges)) << dotgraph << endl;      
     }
   }
 }
@@ -1812,14 +1802,9 @@ TEST (Parser, DISABLED_GetVerticesBlockMultipleVerticesPath)
 	  ASSERT_EQ (vertexattrs[vertex], dotvertexattrs[vertex]) << dotgraph << endl;
       }
 
-      // finally, check the list of edges retrieved from the parser is equal to
-      // the list of edges randomly generated
-      map<string, vector<string>> dotedges = parser.get_graph ();
-      ASSERT_TRUE (equalMaps<string> (edges, dotedges)) << dotgraph << endl;
-
       // -- directed graphs
     
-      // create an undirected graph randomly with the given name
+      // create a directed graph randomly with the given name
       dotgraph = randGraph (0, 100, 5, 10, 0, j, 4, 0, graphname, DIRECTED_GRAPH, DIRECTED_EDGE,
 			    vertices, edges, labels, vertexattrs, edgeattrs);
 
@@ -1848,11 +1833,193 @@ TEST (Parser, DISABLED_GetVerticesBlockMultipleVerticesPath)
 	    dotvertexattrs.find (vertex) != dotvertexattrs.end ())
 	  ASSERT_EQ (vertexattrs[vertex], dotvertexattrs[vertex]) << dotgraph << endl;
       }
+    }
+  }
+}
 
-      // finally, check the list of edges retrieved from the parser is equal to
-      // the list of edges randomly generated
+// Checks that the list of edges and their attributes are correctly processed
+// both in directed and undirected graphs with edges that terminate with a block
+// declaring multiple vertices. The test considers 4 attributes per edge and a
+// number of vertices in the block in the range [1, 5].
+// ----------------------------------------------------------------------------
+TEST (Parser, DISABLED_GetEdgesBlockMultipleVertices)
+{
+
+  srand(time(nullptr));  
+
+  for (auto i = 0 ; i < NB_TESTS ; i++) {
+
+    // for a number of vertices in each block up to j
+    for (auto j = 1 ; j <= 5 ; j++ ) {
+    
+      vector<string> vertices;
+      map<string, vector<string>> edges;
+      map<string, string> labels;
+      map<string, map<string, string>> vertexattrs;
+      map<string, map<string, map<string, string>>> edgeattrs;
+
+      // create a dot parser
+      dot::parser parser;
+    
+      // randomly choose a name for this graph
+      string graphname = randString (10);
+    
+      // -- undirected graphs
+    
+      // create an undirected graph randomly with the given name
+      string dotgraph {randGraph (0, 100, j, 10, 0, 1, 0, 4, graphname, UNDIRECTED_GRAPH, UNDIRECTED_EDGE,
+				  vertices, edges, labels, vertexattrs, edgeattrs)};
+
+      // parse the graph
+      parser.parse_string (dotgraph);
+
+      // verify that all edges have been properly parsed
+      map<string, vector<string>> dotedges = parser.get_graph ();
+      ASSERT_TRUE (equalMaps<string>(edges, dotedges)) << dotgraph << endl;
+
+      // check also that the map with all attributes for all edges is properly
+      // returned
+      map<string, map<string, map<string, string>>> dotedgeattrs = parser.get_all_edge_attributes ();
+    
+      // first, verify that both maps have precisely the same size
+      ASSERT_EQ (edgeattrs.size (), dotedgeattrs.size ()) << dotgraph << endl;
+
+      // now, ensure also that both maps have the same information for all
+      // edges in the random graph
+      for (auto& edge : edges) {
+      
+	// if this edge is specified in either map, then assert that both maps
+	// have precisely the same information
+	if (edgeattrs.find (edge.first) != edgeattrs.end () ||
+	    dotedgeattrs.find (edge.first) != dotedgeattrs.end ())
+	  ASSERT_EQ (edgeattrs[edge.first], dotedgeattrs[edge.first]) << dotgraph << endl;
+      }
+
+      // -- directed graphs
+    
+      // create a directed graph randomly with the given name
+      dotgraph = randGraph (0, 100, j, 10, 0, 1, 0, 4, graphname, DIRECTED_GRAPH, DIRECTED_EDGE,
+			    vertices, edges, labels, vertexattrs, edgeattrs);
+
+      // parse the graph
+      dot::parser diparser;
+      diparser.parse_string (dotgraph);
+
+      // verify that all edges have been properly parsed
       dotedges = diparser.get_graph ();
-      ASSERT_TRUE (equalMaps<string> (edges, dotedges)) << dotgraph << endl;      
+      ASSERT_TRUE (equalMaps<string>(edges, dotedges)) << dotgraph << endl;
+
+      // check also that the map with all attributes for all edges is properly
+      // returned
+      dotedgeattrs = diparser.get_all_edge_attributes ();
+    
+      // first, verify that both maps have precisely the same size
+      ASSERT_EQ (edgeattrs.size (), dotedgeattrs.size ()) << dotgraph << endl;
+
+      // now, ensure also that both maps have the same information for all
+      // edges in the random graph
+      for (auto& edge : edges) {
+      
+	// if this edge is specified in either map, then assert that both maps
+	// have precisely the same information
+	if (edgeattrs.find (edge.first) != edgeattrs.end () ||
+	    dotedgeattrs.find (edge.first) != dotedgeattrs.end ())
+	  ASSERT_EQ (edgeattrs[edge.first], dotedgeattrs[edge.first]) << dotgraph << endl;
+      }
+    }
+  }
+}
+
+// Checks that the list of edges and their attributes are correctly processed
+// both in directed and undirected graphs with path that terminate with a block
+// declaring multiple vertices. The test considers 4 attributes per edge, blocks
+// with up to 5 vertices and paths with a length randomly chosen in the range
+// [1, 5].
+// ----------------------------------------------------------------------------
+TEST (Parser, DISABLED_GetEdgesBlockMultipleVerticesPath)
+{
+
+  srand(time(nullptr));  
+
+  for (auto i = 0 ; i < NB_TESTS ; i++) {
+
+    // for paths of length randomly chosen in the range [1, j]
+    for (auto j = 1 ; j <= 5 ; j++ ) {
+    
+      vector<string> vertices;
+      map<string, vector<string>> edges;
+      map<string, string> labels;
+      map<string, map<string, string>> vertexattrs;
+      map<string, map<string, map<string, string>>> edgeattrs;
+
+      // create a dot parser
+      dot::parser parser;
+    
+      // randomly choose a name for this graph
+      string graphname = randString (10);
+    
+      // -- undirected graphs
+    
+      // create an undirected graph randomly with the given name
+      string dotgraph {randGraph (0, 100, 5, 10, 0, j, 0, 4, graphname, UNDIRECTED_GRAPH, UNDIRECTED_EDGE,
+				  vertices, edges, labels, vertexattrs, edgeattrs)};
+
+      // parse the graph
+      parser.parse_string (dotgraph);
+
+      // verify that all edges have been properly parsed
+      map<string, vector<string>> dotedges = parser.get_graph ();
+      ASSERT_TRUE (equalMaps<string>(edges, dotedges)) << dotgraph << endl;
+
+      // check also that the map with all attributes for all edges is properly
+      // returned
+      map<string, map<string, map<string, string>>> dotedgeattrs = parser.get_all_edge_attributes ();
+    
+      // first, verify that both maps have precisely the same size
+      ASSERT_EQ (edgeattrs.size (), dotedgeattrs.size ()) << dotgraph << endl;
+
+      // now, ensure also that both maps have the same information for all
+      // edges in the random graph
+      for (auto& edge : edges) {
+      
+	// if this edge is specified in either map, then assert that both maps
+	// have precisely the same information
+	if (edgeattrs.find (edge.first) != edgeattrs.end () ||
+	    dotedgeattrs.find (edge.first) != dotedgeattrs.end ())
+	  ASSERT_EQ (edgeattrs[edge.first], dotedgeattrs[edge.first]) << dotgraph << endl;
+      }
+
+      // -- directed graphs
+    
+      // create a directed graph randomly with the given name
+      dotgraph = randGraph (0, 100, 5, 10, 0, j, 0, 4, graphname, DIRECTED_GRAPH, DIRECTED_EDGE,
+			    vertices, edges, labels, vertexattrs, edgeattrs);
+
+      // parse the graph
+      dot::parser diparser;
+      diparser.parse_string (dotgraph);
+
+      // verify that all edges have been properly parsed
+      dotedges = diparser.get_graph ();
+      ASSERT_TRUE (equalMaps<string>(edges, dotedges)) << dotgraph << endl;
+
+      // check also that the map with all attributes for all edges is properly
+      // returned
+      dotedgeattrs = diparser.get_all_edge_attributes ();
+    
+      // first, verify that both maps have precisely the same size
+      ASSERT_EQ (edgeattrs.size (), dotedgeattrs.size ()) << dotgraph << endl;
+
+      // now, ensure also that both maps have the same information for all
+      // edges in the random graph
+      for (auto& edge : edges) {
+      
+	// if this edge is specified in either map, then assert that both maps
+	// have precisely the same information
+	if (edgeattrs.find (edge.first) != edgeattrs.end () ||
+	    dotedgeattrs.find (edge.first) != dotedgeattrs.end ())
+	  ASSERT_EQ (edgeattrs[edge.first], dotedgeattrs[edge.first]) << dotgraph << endl;
+      }
     }
   }
 }

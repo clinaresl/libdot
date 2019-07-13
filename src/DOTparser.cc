@@ -131,6 +131,31 @@ bool dot::parser::_read_void (string& contents, const string& regexp, const stri
   return true;
 }
 
+// updates the contents of the graph adding the edge orig->target and, if
+// the arc is undirected, it adds also the edge target->orig. Finally,
+// because the list of vertices is computed from the matrix of adjacency,
+// then target is added to the graph even if it has no neighbours.
+void dot::parser::_update_graph (const string& orig_name, const string& edge_type, const string& target_name)
+{
+
+  // make sure this target vertex was not processed before
+  if (find (_graph[orig_name].begin (), _graph[orig_name].end (),
+	    target_name) == _graph[orig_name].end ())
+    _graph[orig_name].push_back (target_name);
+
+  // if the edge is undirected, then add the edge in the opposite direction as
+  // well
+  if (edge_type!="->")
+    if (find (_graph[target_name].begin (), _graph[target_name].end (),
+	      orig_name) == _graph[target_name].end ())
+      _graph[target_name].push_back (orig_name);
+
+  // and do not forget to add the target vertex to the graph even if it
+  // has no neighbours
+  if (edge_type == "->" && _graph.find (target_name) == _graph.end ()) 
+    _graph[target_name] = vector<string>();
+}
+    
 // parse an attributes section. The attributes read are return as a map that
 // stores for every attribute its value as a string. It returns true if any
 // attributes were found and raises an exception otherwise
@@ -209,7 +234,7 @@ bool dot::parser::_process_label_value (string& contents, const string& labelid)
 // contents. It returns true upon successful completion and false otherwise
 bool dot::parser::_process_single_vertex (string& contents,
 					  const string& orig_name, const string& edge_type,
-					  const string& target_name, map<string, string>& arcdict)
+					  const string& target_name, map<string, string> arcdict)
 {
 
   // first, process the edge attributes: if and only if any edge attributes were
@@ -264,20 +289,9 @@ bool dot::parser::_process_multiple_vertices (string& contents, const string& or
 	  throw dot::syntax_error ("TARGET_NAME could not be parsed");
 	else {
 
-	  // make sure this target vertex was not processed before
-	  if (find (_graph[orig_name].begin (), _graph[orig_name].end (),
-		    target_name) == _graph[orig_name].end ())
-	    _graph[orig_name].push_back (target_name);
-	  if (edge_type!="->")
-	    if (find (_graph[target_name].begin (), _graph[target_name].end (),
-		      orig_name) == _graph[target_name].end ())
-	      _graph[target_name].push_back (orig_name);
-
-	  // and do not forget to add the target vertex to the graph even if it
-	  // has no neighbours
-	  if (edge_type == "->" && _graph.find (target_name) == _graph.end ()) 
-	    _graph[target_name] = vector<string>();
-    
+	  // and update the graph with this edge
+	  _update_graph (orig_name, edge_type, target_name);
+	  
 	  // process now the edge attributes given to this vertex and, if given,
 	  // the attributes of the target vertex as well
 	  _process_single_vertex (contents, orig_name, edge_type, target_name, arcdict);
@@ -292,14 +306,16 @@ bool dot::parser::_process_multiple_vertices (string& contents, const string& or
   return true;
 }
 
-// process a trajectory or path defined over single definitions of vertices
-// from the origin vertex specified. It returns true upon successful
-// completion of the trajectory and raises an exception otherwise
+// process a trajectory or path defined over single definitions of vertices from
+// the origin vertex specified which, however, could be terminated with a block
+// with multiple vertices. It returns true upon successful completion of the
+// trajectory and raises an exception otherwise
 bool dot::parser::_process_trajectory (string& contents, string& orig_name)
 {
 
   string edge_type;
   string target_name;
+  int pathlength = 0;
 
   // in case a block with multiple vertices is found, it is necessary to enable
   // the following flag to ensure that no edges follow it
@@ -315,8 +331,8 @@ bool dot::parser::_process_trajectory (string& contents, string& orig_name)
 	  
     // yeah! A path is listed, parse the attributes of this edge if any were
     // given
-    map<string, string> nestedarcdict;
-    _process_attributes (contents, nestedarcdict);
+    map<string, string> arcdict;
+    _process_attributes (contents, arcdict);
 
     // get the target vertex of this specific edge
     if (!_read_string (contents, VERTEX_NAME, target_name, "TARGET VERTEX")) {
@@ -325,34 +341,31 @@ bool dot::parser::_process_trajectory (string& contents, string& orig_name)
       // a block with multiple vertices is declared, but we should make sure
       // that this is the last part of the statement so that no edges can follow
       // it
-      _process_multiple_vertices (contents, orig_name, edge_type, nestedarcdict);
+      _process_multiple_vertices (contents, orig_name, edge_type, arcdict);
       block_found = true;
     }
     else {
 
-      // make sure this target vertex was not processed before
-      if (find (_graph[orig_name].begin (), _graph[orig_name].end (),
-		target_name) == _graph[orig_name].end ())
-	_graph[orig_name].push_back (target_name);
-      if (edge_type!="->")
-	if (find (_graph[target_name].begin (), _graph[target_name].end (),
-		  orig_name) == _graph[target_name].end ())
-	  _graph[target_name].push_back (orig_name);
-      
-      // and do not forget to add the target vertex to the graph even if it
-      // has no neighbours
-      if (edge_type == "->" && _graph.find (target_name) == _graph.end ()) 
-	_graph[target_name] = vector<string>();
-      
+      // and update the graph with this edge
+      _update_graph (orig_name, edge_type, target_name);
+	  
       // and update all the edge attributes of this edge and also the attributes
       // of the target vertex if any were given
-      _process_single_vertex (contents, orig_name, edge_type, target_name, nestedarcdict);
+      _process_single_vertex (contents, orig_name, edge_type, target_name, arcdict);
     }
 
     // and now make the
-    orig_name = target_name;    
+    orig_name = target_name;
+
+    // and increment the path length
+    pathlength++;
   }
 
+  // if no edge was found, then raise a syntax error
+  if (!pathlength)
+    throw dot::syntax_error ("no EDGE_TYPE has been provided");
+
+  // otherwise leave gracefully
   return true;
 }
 
@@ -607,53 +620,9 @@ bool dot::parser::parse_string (string contents)
 	continue;
       }
 
-      // now, get the edge type, either directed or undirected
-      string edge_type;
-      if (!_read_string (contents, EDGE_TYPE, edge_type, "EDGE TYPE"))
-	throw dot::syntax_error ("no EDGE_TYPE has been provided");
-
-      // and process its attributes. Note that at this point, the edge
-      // attributes are only parsed and saved. They are written to the private
-      // data members later when invoking either process_single_vertex or
-      // process_multiple_vertices
-      map<string, string> arcdict;
-      _process_attributes (contents, arcdict);      
-
-      // the target can be specified in two different forms: either single or
-      // multiple. A single target consists uniquely of a single vertex
-      string target_name;
-      if (!_read_string (contents, VERTEX_NAME, target_name, "TARGET VERTEX"))
-	_process_multiple_vertices (contents, orig_name, edge_type, arcdict);
-
-      // if the target was given in single form, then process the attributes of
-      // the edge from its origin, if given
-      else {
-
-	// make sure this target vertex was not already processed ---because it
-	// is a repeated entry
-	if (find (_graph[orig_name].begin (), _graph[orig_name].end (),
-		  target_name) == _graph[orig_name].end ())
-	  _graph[orig_name].push_back (target_name);
-	if (edge_type!="->")
-	  if (find (_graph[target_name].begin (), _graph[target_name].end (),
-		    orig_name) == _graph[target_name].end ())
-	    _graph[target_name].push_back (orig_name);
-
-	// and do not forget to add the target vertex to the graph even if it
-	// has no neighbours
-	if (edge_type == "->" && _graph.find (target_name) == _graph.end ()) 
-	  _graph[target_name] = vector<string>();
-	
-	// process now the edge attributes given to this vertex and, if given,
-	// the attributes of the target vertex as well
-	_process_single_vertex (contents, orig_name, edge_type, target_name, arcdict);
-
-	// now, maybe a trajectory is listed ---which is only allowed with
-	// single vertices. Note that the origin vertex of the trajectory is the
-	// target vertex of the preceding edge.
-	_process_trajectory (contents, target_name);
-      }
-
+      // and now process the entire trajectory from this original vertex
+      _process_trajectory (contents, orig_name);
+      
       // this completes the processing of a single statement, consume the
       // semicolon in case it has been given
       _parse_comments (contents);

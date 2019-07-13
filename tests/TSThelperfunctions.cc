@@ -528,6 +528,8 @@ string randPath (int pathlength, int p, int nbmultiplenodes, int edge_spec,
 	edgeusedattrs = edgemergedattrs;
 	if (edge_type == UNDIRECTED_EDGE)
 	  edgeattrs [itarget][source].merge (edgeusedattrs);
+
+	edgeusedattrs = edgemergedattrs;
       }
     
       // update the collection of edges in the final graph. Note that it is possible

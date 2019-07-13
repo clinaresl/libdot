@@ -134,6 +134,12 @@ namespace dot {
     // matches. Additionally, it shows the given label if and only if verbose is
     // enabled
     bool _read_void (string& contents, const string& regexp, const string& label) const;
+
+    // updates the contents of the graph adding the edge orig->target and, if
+    // the arc is undirected, it adds also the edge target->orig. Finally,
+    // because the list of vertices is computed from the matrix of adjacency,
+    // then target is added to the graph even if it has no neighbours.
+    void _update_graph (const string& orig_name, const string& edge_type, const string& target_name);
     
     // parse an attributes section. The attributes read are return as a map that
     // stores for every attribute its value as a string. It returns true if any
@@ -152,7 +158,7 @@ namespace dot {
     // contents. It returns true upon successful completion and false otherwise
     bool _process_single_vertex (string& contents,
 				 const string& orig_name, const string& edge_type,
-				 const string& target_name, map<string, string>& arcdict);
+				 const string& target_name, map<string, string> arcdict);
   
     // process a multiple declaration of target vertices which should appear
     // right at the beginning of the specified contents. The original vertex,
