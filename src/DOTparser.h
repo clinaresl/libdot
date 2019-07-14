@@ -234,7 +234,7 @@ namespace dot {
     // target is not found to be a neighbour of the origin, or no attribute is
     // found in the edge joining those two vertices with the given name, an
     // exception is raised.
-    string get_edge_attribute (const string& origin, const string& target, const string& attr);
+    string get_edge_attribute (const string& origin, const string& target, const string& attrname);
 
     // Sets the verbose level to true by default
     void set_verbose (bool value = true)

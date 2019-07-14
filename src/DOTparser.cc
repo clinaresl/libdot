@@ -523,7 +523,7 @@ std::map<std::string, std::string> dot::parser::get_edge_attributes (const strin
 // edge joining those two vertices with the given name, an exception is raised.
 std::string dot::parser::get_edge_attribute (const string& origin,
 					     const string& target,
-					     const string& attr)
+					     const string& attrname)
 {
 
   // verify that the specified origin actually exists
@@ -545,15 +545,15 @@ std::string dot::parser::get_edge_attribute (const string& origin,
 
       // in case there is no attribute with the specified name, raise an
       // exception
-      if (jattrs->second.find (attr) == jattrs->second.end ())
-	throw dot::syntax_error (" The edge joining vertices '" + origin + "' and '" + target + "' has no attribute named '" + attr + "'");
+      if (jattrs->second.find (attrname) == jattrs->second.end ())
+	throw dot::syntax_error (" The edge joining vertices '" + origin + "' and '" + target + "' has no attribute named '" + attrname + "'");
     }
   }
 
   // at this point, both the origin and the target are known to exist. Besides,
   // an attribute with the specified name is known to exist for the edge joining
   // those vertices, so just retrieve it
-  return _edge[origin][target][attr];
+  return _edge[origin][target][attrname];
 }
 
 // parse the given string. It returns true if the string could be successfully

@@ -10,6 +10,9 @@ Welcome to DOT Parser's documentation!
    :maxdepth: 2
    :caption: Contents:
 
+   Introduction
+   The DOT language
+   Application Programming Interface
    Unit tests
 
 Indices and tables
