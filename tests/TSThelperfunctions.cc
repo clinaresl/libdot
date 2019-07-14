@@ -24,6 +24,52 @@ string randInt (int bound)
 }
 
 // ----------------------------------------------------------------------------
+// FLOATING-POINT NUMBERS
+// ----------------------------------------------------------------------------
+
+// Generate a random floating-point number in scientific notation or not. If the
+// scientific notation is not used, the number is selected in the bound [-bound,
+// +bound]. If the scientific notation is randomly chosen, the number is added
+// an exponent in the interval [-299, +299]. Note that the result is given as a
+// string
+string randFloat (int bound)
+{
+
+  string output = "";
+  
+  // first, select whether an integer part must be used or not (so that floating
+  // point numbers starting immediately with a dot are also returned). With a
+  // 20% of probability, numbers start with a dot
+  if (rand () % 10 >= 2)
+    output = randInt (bound);
+  
+  // now, select a dot or not. In case that an integer part was not chosen, then
+  // a dot is chosen for sure
+  if (output.length () == 0 || rand () % 2==0) {
+    
+    output += ".";
+
+    // now, select a mantisa randomly only in case a dot has been selected
+    if (output == "." || rand () % 2 == 0)
+      output += to_string (rand () % bound);
+  }
+
+  // now randomly decide whether to show an exponent or not. With a probability
+  // equal to 20% exponents are generated
+  if (rand () % 10 < 2) {
+
+    // start with either e or E
+    output += (rand () % 2) ? "E" : "e";
+
+    // and now add the exponent
+    output += randInt (299);
+  }
+
+  // return the number
+  return output;
+}
+
+// ----------------------------------------------------------------------------
 // STRINGS
 // ----------------------------------------------------------------------------
 
@@ -107,7 +153,7 @@ vector<string> randLabels (int nblabels, map<string, string>& labels)
       value = randInt (1000000);
       break;
     case 1: /* floating-point numbers */
-      value = "3.14159";
+      value = randFloat (1000000);
       break;
     case 2: /* unquoted strings */
 

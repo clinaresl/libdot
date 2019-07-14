@@ -33,7 +33,7 @@
 #define BLOCK_BEGIN R"(^[[:space:]]*\{)"
 #define BLOCK_END R"(^[[:space:]]*})"
 #define LABEL_ASSIGNMENT R"(^[[:space:]]*(([0-9a-zA-Z_]+))[[:space:]]*=)"
-#define LABEL_VALUE R"(^[[:space:]]*((([+-]?(\.[[:digit:]]|[[:digit:]]+(\.[[:digit:]]*)?))|([a-zA-Z_][0-9a-zA-Z_]+)|(\".*")+))[[:space:]]*)"
+#define LABEL_VALUE R"(^[[:space:]]*((([-+]?(\d+\.?\d*|\d*\.?\d+)([Ee][-+]?[0-2]?\d{1,2})?)|([a-zA-Z_][0-9a-zA-Z_]+)|(\".*")+))[[:space:]]*)"
 #define VERTEX_NAME R"(^[[:space:]]*([0-9a-zA-Z_]+))"
 #define EDGE_TYPE R"(^[[:space:]]*(--|->))"
 #define END_OF_STATEMENT R"(^[[:space:]]*;)"
@@ -41,8 +41,8 @@
 
 #define ATTRIBUTE_BEGIN R"(^[[:space:]]*\[)"
 #define ATTRIBUTE_NAME R"(^[[:space:]]*(([0-9a-zA-Z_]+))[[:space:]]*=)"
-#define ATTRIBUTE_VALUE_NEXT R"(^[[:space:]]*((([+-]?(\.[[:digit:]]|[[:digit:]]+(\.[[:digit:]]*)?))|([0-9a-zA-Z_]+)|(\"[^\"]*\")+))[[:space:]]*,)"
-#define ATTRIBUTE_VALUE_END R"(^[[:space:]]*((([+-]?(\.[[:digit:]]|[[:digit:]]+(\.[[:digit:]]*)?))|([0-9a-zA-Z_]+)|(\"[^\"]*\")+))[[:space:]]*\])"
+#define ATTRIBUTE_VALUE_NEXT R"(^[[:space:]]*((([-+]?(\d+\.?\d*|\d*\.?\d+)([Ee][-+]?[0-2]?\d{1,2})?)|([0-9a-zA-Z_]+)|(\"[^\"]*\")+))[[:space:]]*,)"
+#define ATTRIBUTE_VALUE_END R"(^[[:space:]]*((([-+]?(\d+\.?\d*|\d*\.?\d+)([Ee][-+]?[0-2]?\d{1,2})?)|([0-9a-zA-Z_]+)|(\"[^\"]*\")+))[[:space:]]*\])"
 #define ATTRIBUTE_END R"(^[[:space:]]*\])"
 
 namespace dot {

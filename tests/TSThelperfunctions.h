@@ -76,6 +76,17 @@ bool equalMaps (map<T, vector<T>>& m1, map<T, vector<T>>& m2)
 string randInt (int bound);
 
 // ----------------------------------------------------------------------------
+// FLOATING-POINT NUMBERS
+// ----------------------------------------------------------------------------
+
+// Generate a random floating-point number in scientific notation or not. If the
+// scientific notation is not used, the number is selected in the bound [-bound,
+// +bound]. If the scientific notation is randomly chosen, the number is added
+// an exponent in the interval [-299, +299]. Note that the result is given as a
+// string
+string randFloat (int bound);
+
+// ----------------------------------------------------------------------------
 // STRINGS
 // ----------------------------------------------------------------------------
 

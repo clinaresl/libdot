@@ -16,7 +16,16 @@ To run the tests, type:
 
    $ make check
 
-from the root directory where the library has been installed
+from the root directory where the library has been installed. In case
+all tests are enabled, a failure might be reported for all those unit
+tests that require accessing files below the directory
+:file:`tests`. To make sure the tests are performed correctly it is
+strongly adviced to execute the following commands:
+
+.. code-block:: shell
+
+   $ cd tests
+   $ ./gtest --gtest_also_run_disabled_tests
 
 ==============================
 Testing DOT files
