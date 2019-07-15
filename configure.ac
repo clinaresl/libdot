@@ -1,4 +1,4 @@
-## libtest:
+## libdot:
 
 AC_INIT([LibDot], [0.1.0], [carlos.linares@uc3m.es], [libdot],
         [http://www.plg.inf.uc3m.es/~clinares])

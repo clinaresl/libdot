@@ -10,7 +10,7 @@ AUTOMAKE_OPTIONS = subdir-objects
 ACLOCAL_AMFLAGS = -I m4 ${ACLOCAL_FLAGS}
 
 ## Automake macro to compile code according to the c++11 standard
-AM_CPPFLAGS = -std=c++11
+AM_CPPFLAGS = -std=c++17
 
 ## Define a libtool archive target "libdot-@LIBDOT_API_VERSION@.la", with
 ## @LIBDOT_API_VERSION@ substituted into the generated Makefile at configure
