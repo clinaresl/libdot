@@ -90,6 +90,17 @@ string randFloat (int bound);
 // STRINGS
 // ----------------------------------------------------------------------------
 
+// Remove the heading and trailing double quotes in str if given
+string removeDoubleQuotes (const string& str);
+
+// Remove the heading and trailing double quotes in the second field of each
+// entry if given
+map<string, string> removeDoubleQuotes (const map<string, string>& strmap);
+
+// Remove the heading and trailing double quotes in the second field of the
+// inner map if any
+map<string, map<string, string>> removeDoubleQuotes (const map<string, map<string, string>>& strmap);
+
 // Generate a random string with characters in the sequence ASCII(45) -
 // ASCII(122) which do not appear in the string exclude. Note that by default
 // exclude makes the random string to contain only alphanum characters and the

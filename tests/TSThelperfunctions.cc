@@ -73,6 +73,36 @@ string randFloat (int bound)
 // STRINGS
 // ----------------------------------------------------------------------------
 
+// Remove the heading and trailing double quotes in str if given
+string removeDoubleQuotes (const string& str)
+{
+  if (str[0] == '"' && str[str.size ()-1] == '"')
+    return str.substr (1, str.size ()-2);
+  return str;
+}
+
+// Remove the heading and trailing double quotes in the second field of each
+// entry if given
+map<string, string> removeDoubleQuotes (const map<string, string>& strmap)
+{
+  map<string, string> result;
+
+  for (auto& key : strmap)
+    result [key.first] = removeDoubleQuotes (key.second);
+  return result;
+}
+
+// Remove the heading and trailing double quotes in the second field of the
+// inner map if any
+map<string, map<string, string>> removeDoubleQuotes (const map<string, map<string, string>>& strmap)
+{
+  map<string, map<string, string>> result;
+
+  for (auto& key : strmap)
+    result [key.first] = removeDoubleQuotes (key.second);
+
+  return result;
+}
 // Generate a random string with characters in the sequence ASCII(45) -
 // ASCII(122) which do not appear in the string exclude. Note that by default
 // exclude makes the random string to contain only alphanum characters and the
@@ -162,7 +192,7 @@ vector<string> randLabels (int nblabels, map<string, string>& labels)
       value = randString (1, ":;<=>?@[\\]^`0123456789") + randString (9);
       break;
     case 3: /*quoted strings*/
-      value+= "\"" + randQuotedString (10) + "\"";
+      value = "\"" + randQuotedString (10) + "\"";
       break;
     }
 

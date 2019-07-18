@@ -20,13 +20,13 @@
 # -- Project information -----------------------------------------------------
 
 project = 'DOT Parser'
-copyright = '2019, Carlos Linares Lopez'
-author = 'Carlos Linares Lopez'
+copyright = '2019, Carlos Linares López'
+author = 'Carlos Linares López'
 
 # The short X.Y version
 version = ''
 # The full version, including alpha/beta/rc tags
-release = '0.1.0'
+release = '1.0.0'
 
 
 # -- General configuration ---------------------------------------------------
@@ -129,7 +129,7 @@ latex_elements = {
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
     (master_doc, 'DOTParser.tex', 'DOT Parser Documentation',
-     'Carlos Linares Lopez', 'manual'),
+     'Carlos Linares López', 'manual'),
 ]
 
 

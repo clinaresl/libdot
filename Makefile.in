@@ -563,7 +563,7 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 AUTOMAKE_OPTIONS = subdir-objects
 ACLOCAL_AMFLAGS = -I m4 ${ACLOCAL_FLAGS}
-AM_CPPFLAGS = -std=c++11
+AM_CPPFLAGS = -std=c++17
 lib_LTLIBRARIES = libdot-@LIBDOT_API_VERSION@.la
 libdot_@LIBDOT_API_VERSION@_la_SOURCES = src/DOTparser.cc
 libdot_@LIBDOT_API_VERSION@_la_LDFLAGS = -version-info $(LIBDOT_SO_VERSION)

@@ -179,6 +179,10 @@ bool dot::parser::_process_attributes (string& contents, map<string, string>& di
       // try first to read the value of this attribute followed by and end
       // of attribute section (']')
       if ((eoattr = _parse_string (contents, ATTRIBUTE_VALUE_END, attrvalue))) {
+
+	// Make sure to remove the double quotes in case they were given
+	if (attrvalue [0] == '"' && attrvalue[attrvalue.size () - 1] =='"')
+	  attrvalue = attrvalue.substr (1, attrvalue.size () - 2);
 	show_value ("\tVALUE (*)", attrvalue, _verbose);
 
 	// store the last read pair in the map
@@ -187,6 +191,10 @@ bool dot::parser::_process_attributes (string& contents, map<string, string>& di
 
       // otherwise, read the next value followed by a comma
       else if (_parse_string (contents, ATTRIBUTE_VALUE_NEXT, attrvalue)) {
+
+	// Make sure to remove the double quotes in case they were given
+	if (attrvalue [0] == '"' && attrvalue[attrvalue.size () - 1] =='"')
+	  attrvalue = attrvalue.substr (1, attrvalue.size () - 2);
 	show_value ("\tVALUE", attrvalue, _verbose);
 
 	// store the last read pair in the map
@@ -223,7 +231,9 @@ bool dot::parser::_process_label_value (string& contents, const string& labelid)
     throw dot::syntax_error ("it was not possible to read a LABEL_VALUE");
   
   // if a value could be successfully processed for this label, then store
-  // it
+  // it. Make sure to remove the double quotes in case they were given
+  if (label_value [0] == '"' && label_value[label_value.size () - 1] =='"')
+    label_value = label_value.substr (1, label_value.size () - 2);
   _label[labelid] = label_value;
   return true;
 }

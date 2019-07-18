@@ -563,7 +563,7 @@ TEST (Parser, DISABLED_GetLabels)
       ASSERT_TRUE (find (dotlabels.begin (), dotlabels.end (), label.first) != dotlabels.end ()) << dotgraph << endl;
 
       // ensure also that both have the same value for this label
-      ASSERT_EQ (parser.get_label_value (label.first), label.second) << dotgraph << endl;
+      ASSERT_EQ (parser.get_label_value (label.first), removeDoubleQuotes (label.second)) << dotgraph << endl;
     }
 
     // In passing, verify also that the list of vertices is properly parsed
@@ -626,7 +626,7 @@ TEST (Parser, DISABLED_GetAllVertexAttributes)
 	// have precisely the same information
 	if (vertexattrs.find (vertex) != vertexattrs.end () ||
 	    dotvertexattrs.find (vertex) != dotvertexattrs.end ())
-	  ASSERT_EQ (vertexattrs[vertex], dotvertexattrs[vertex]) << dotgraph << endl;
+	  ASSERT_EQ (removeDoubleQuotes (vertexattrs[vertex]), dotvertexattrs[vertex]) << dotgraph << endl;
       }
 
       // -- directed graphs
@@ -654,7 +654,7 @@ TEST (Parser, DISABLED_GetAllVertexAttributes)
 	// have precisely the same information
 	if (vertexattrs.find (vertex) != vertexattrs.end () ||
 	    dotvertexattrs.find (vertex) != dotvertexattrs.end ())
-	  ASSERT_EQ (vertexattrs[vertex], dotvertexattrs[vertex]) << dotgraph << endl;
+	  ASSERT_EQ (removeDoubleQuotes (vertexattrs[vertex]), dotvertexattrs[vertex]) << dotgraph << endl;
       }
     }
   }
@@ -702,7 +702,7 @@ TEST (Parser, DISABLED_GetVertexAttributesByName)
 	map<string, string> dotvertexattrs = parser.get_vertex_attributes (vertex);
 
 	// first, verify that both maps are precisely the same
-	ASSERT_EQ (dotvertexattrs, vertexattrs[vertex]) << dotgraph << endl;
+	ASSERT_EQ (dotvertexattrs, removeDoubleQuotes (vertexattrs[vertex])) << dotgraph << endl;
       }
 
       // -- directed graphs
@@ -722,7 +722,7 @@ TEST (Parser, DISABLED_GetVertexAttributesByName)
 	map<string, string> dotvertexattrs = diparser.get_vertex_attributes (vertex);
 
 	// first, verify that both maps are precisely the same
-	ASSERT_EQ (dotvertexattrs, vertexattrs[vertex]) << dotgraph << endl;
+	ASSERT_EQ (dotvertexattrs, removeDoubleQuotes (vertexattrs[vertex])) << dotgraph << endl;
       }
     }
   }
@@ -771,7 +771,8 @@ TEST (Parser, DISABLED_GetSingleVertexAttributeByName)
 	for (auto& attr : vertexattrs[vertex]) 
 
 	  // verify that the dot parser returns precisely the same value
-	  ASSERT_EQ (parser.get_vertex_attribute (vertex, attr.first), attr.second) << dotgraph << endl;
+	  ASSERT_EQ (parser.get_vertex_attribute (vertex, attr.first),
+		     removeDoubleQuotes (attr.second)) << dotgraph << endl;
       }
 
       // -- directed graphs
@@ -792,7 +793,8 @@ TEST (Parser, DISABLED_GetSingleVertexAttributeByName)
 	for (auto& attr : vertexattrs[vertex]) 
 
 	  // verify that the dot parser returns precisely the same value
-	  ASSERT_EQ (diparser.get_vertex_attribute (vertex, attr.first), attr.second) << dotgraph << endl;
+	  ASSERT_EQ (diparser.get_vertex_attribute (vertex, attr.first),
+		     removeDoubleQuotes (attr.second)) << dotgraph << endl;
       }
     }
   }
@@ -854,7 +856,7 @@ TEST (Parser, DISABLED_GetNodeStatements)
 	// have precisely the same information
 	if (vertexattrs.find (vertex) != vertexattrs.end () ||
 	    dotvertexattrs.find (vertex) != dotvertexattrs.end ())
-	  ASSERT_EQ (vertexattrs[vertex], dotvertexattrs[vertex]) << dotgraph << endl;
+	  ASSERT_EQ (removeDoubleQuotes (vertexattrs[vertex]), dotvertexattrs[vertex]) << dotgraph << endl;
       }
 
       // -- directed graphs
@@ -887,7 +889,7 @@ TEST (Parser, DISABLED_GetNodeStatements)
 	// have precisely the same information
 	if (vertexattrs.find (vertex) != vertexattrs.end () ||
 	    dotvertexattrs.find (vertex) != dotvertexattrs.end ())
-	  ASSERT_EQ (vertexattrs[vertex], dotvertexattrs[vertex]) << dotgraph << endl;
+	  ASSERT_EQ (removeDoubleQuotes (vertexattrs[vertex]), dotvertexattrs[vertex]) << dotgraph << endl;
       }      
     }
   }
@@ -947,7 +949,7 @@ TEST (Parser, DISABLED_GetAllEdgeAttributes)
 	// have precisely the same information
 	if (edgeattrs.find (edge.first) != edgeattrs.end () ||
 	    dotedgeattrs.find (edge.first) != dotedgeattrs.end ())
-	  ASSERT_EQ (edgeattrs[edge.first], dotedgeattrs[edge.first]) << dotgraph << endl;
+	  ASSERT_EQ (removeDoubleQuotes (edgeattrs[edge.first]), dotedgeattrs[edge.first]) << dotgraph << endl;
       }
 
       // -- directed graphs
@@ -979,7 +981,7 @@ TEST (Parser, DISABLED_GetAllEdgeAttributes)
 	// have precisely the same information
 	if (edgeattrs.find (edge.first) != edgeattrs.end () ||
 	    dotedgeattrs.find (edge.first) != dotedgeattrs.end ())
-	  ASSERT_EQ (edgeattrs[edge.first], dotedgeattrs[edge.first]) << dotgraph << endl;
+	  ASSERT_EQ (removeDoubleQuotes (edgeattrs[edge.first]), dotedgeattrs[edge.first]) << dotgraph << endl;
       }
     }
   }
@@ -1029,7 +1031,7 @@ TEST (Parser, DISABLED_GetEdgeAttributesByName)
 	  map<string, string> dotedgeattrs = parser.get_edge_attributes (edge.first, target);
 	  
 	  // now verify that the attributes of this edge are properly processed
-	  ASSERT_EQ (dotedgeattrs, edgeattrs[edge.first][target]) << dotgraph << endl;
+	  ASSERT_EQ (dotedgeattrs, removeDoubleQuotes (edgeattrs[edge.first][target])) << dotgraph << endl;
 	}
       }
 
@@ -1052,7 +1054,7 @@ TEST (Parser, DISABLED_GetEdgeAttributesByName)
 	  map<string, string> dotedgeattrs = diparser.get_edge_attributes (edge.first, target);
 	  
 	  // now verify that the attributes of this edge are properly processed
-	  ASSERT_EQ (dotedgeattrs, edgeattrs[edge.first][target]) << dotgraph << endl;
+	  ASSERT_EQ (dotedgeattrs, removeDoubleQuotes (edgeattrs[edge.first][target])) << dotgraph << endl;
 	}
       }
     }
@@ -1107,7 +1109,7 @@ TEST (Parser, DISABLED_GetSingleEdgeAttributeByName)
 	  
 	    // now verify that the value of this attribute of this edge has been
 	    // properly processed
-	    ASSERT_EQ (dotedgeattr, attr.second) << dotgraph << endl;
+	    ASSERT_EQ (dotedgeattr, removeDoubleQuotes (attr.second)) << dotgraph << endl;
 	  }
 	}
       }
@@ -1135,7 +1137,7 @@ TEST (Parser, DISABLED_GetSingleEdgeAttributeByName)
 	  
 	    // now verify that the value of this attribute of this edge has been
 	    // properly processed
-	    ASSERT_EQ (dotedgeattr, attr.second) << dotgraph << endl;
+	    ASSERT_EQ (dotedgeattr, removeDoubleQuotes (attr.second)) << dotgraph << endl;
 	  }
 	}
       }
@@ -1200,7 +1202,7 @@ TEST (Parser, DISABLED_GetAllVertexAttributesPath)
 	// have precisely the same information
 	if (vertexattrs.find (vertex) != vertexattrs.end () ||
 	    dotvertexattrs.find (vertex) != dotvertexattrs.end ())
-	  ASSERT_EQ (vertexattrs[vertex], dotvertexattrs[vertex]) << dotgraph << endl;
+	  ASSERT_EQ (removeDoubleQuotes (vertexattrs[vertex]), dotvertexattrs[vertex]) << dotgraph << endl;
       }
 
       // -- directed graphs
@@ -1232,7 +1234,7 @@ TEST (Parser, DISABLED_GetAllVertexAttributesPath)
 	// have precisely the same information
 	if (vertexattrs.find (vertex) != vertexattrs.end () ||
 	    dotvertexattrs.find (vertex) != dotvertexattrs.end ())
-	  ASSERT_EQ (vertexattrs[vertex], dotvertexattrs[vertex]) << dotgraph << endl;
+	  ASSERT_EQ (removeDoubleQuotes (vertexattrs[vertex]), dotvertexattrs[vertex]) << dotgraph << endl;
       }
     }
   }
@@ -1286,7 +1288,7 @@ TEST (Parser, DISABLED_GetVertexAttributesByNamePath)
 	map<string, string> dotvertexattrs = parser.get_vertex_attributes (vertex);
 
 	// first, verify that both maps are precisely the same
-	ASSERT_EQ (dotvertexattrs, vertexattrs[vertex]) << dotgraph << endl;
+	ASSERT_EQ (dotvertexattrs, removeDoubleQuotes (vertexattrs[vertex])) << dotgraph << endl;
       }
 
 
@@ -1311,7 +1313,7 @@ TEST (Parser, DISABLED_GetVertexAttributesByNamePath)
 	map<string, string> dotvertexattrs = diparser.get_vertex_attributes (vertex);
 
 	// first, verify that both maps are precisely the same
-	ASSERT_EQ (dotvertexattrs, vertexattrs[vertex]) << dotgraph << endl;
+	ASSERT_EQ (dotvertexattrs, removeDoubleQuotes (vertexattrs[vertex])) << dotgraph << endl;
       }
     }
   }
@@ -1366,7 +1368,8 @@ TEST (Parser, DISABLED_GetSingleVertexAttributeByNamePath)
 	for (auto& attr : vertexattrs[vertex]) 
 
 	  // verify that the dot parser returns precisely the same value
-	  ASSERT_EQ (parser.get_vertex_attribute (vertex, attr.first), attr.second) << dotgraph << endl;
+	  ASSERT_EQ (parser.get_vertex_attribute (vertex, attr.first),
+		     removeDoubleQuotes (attr.second)) << dotgraph << endl;
       }
 
       // -- directed graphs
@@ -1391,7 +1394,8 @@ TEST (Parser, DISABLED_GetSingleVertexAttributeByNamePath)
 	for (auto& attr : vertexattrs[vertex]) 
 
 	  // verify that the dot parser returns precisely the same value
-	  ASSERT_EQ (diparser.get_vertex_attribute (vertex, attr.first), attr.second) << dotgraph << endl;
+	  ASSERT_EQ (diparser.get_vertex_attribute (vertex, attr.first),
+		     removeDoubleQuotes (attr.second)) << dotgraph << endl;
       }
     }
   }
@@ -1453,7 +1457,7 @@ TEST (Parser, DISABLED_GetAllEdgeAttributesPath)
 	// have precisely the same information
 	if (edgeattrs.find (edge.first) != edgeattrs.end () ||
 	    dotedgeattrs.find (edge.first) != dotedgeattrs.end ())
-	  ASSERT_EQ (edgeattrs[edge.first], dotedgeattrs[edge.first]) << dotgraph << endl;
+	  ASSERT_EQ (removeDoubleQuotes (edgeattrs[edge.first]), dotedgeattrs[edge.first]) << dotgraph << endl;
       }
 
       // -- directed graphs
@@ -1485,7 +1489,7 @@ TEST (Parser, DISABLED_GetAllEdgeAttributesPath)
 	// have precisely the same information
 	if (edgeattrs.find (edge.first) != edgeattrs.end () ||
 	    dotedgeattrs.find (edge.first) != dotedgeattrs.end ())
-	  ASSERT_EQ (edgeattrs[edge.first], dotedgeattrs[edge.first]) << dotgraph << endl;
+	  ASSERT_EQ (removeDoubleQuotes (edgeattrs[edge.first]), dotedgeattrs[edge.first]) << dotgraph << endl;
       }
     }
   }
@@ -1536,7 +1540,7 @@ TEST (Parser, DISABLED_GetEdgeAttributesByNamePath)
 	  map<string, string> dotedgeattrs = parser.get_edge_attributes (edge.first, target);
 	  
 	  // now verify that the attributes of this edge are properly processed
-	  ASSERT_EQ (dotedgeattrs, edgeattrs[edge.first][target]) << dotgraph << endl;
+	  ASSERT_EQ (dotedgeattrs, removeDoubleQuotes (edgeattrs[edge.first][target])) << dotgraph << endl;
 	}
       }
 
@@ -1559,7 +1563,7 @@ TEST (Parser, DISABLED_GetEdgeAttributesByNamePath)
 	  map<string, string> dotedgeattrs = diparser.get_edge_attributes (edge.first, target);
 	  
 	  // now verify that the attributes of this edge are properly processed
-	  ASSERT_EQ (dotedgeattrs, edgeattrs[edge.first][target]) << dotgraph << endl;
+	  ASSERT_EQ (dotedgeattrs, removeDoubleQuotes (edgeattrs[edge.first][target])) << dotgraph << endl;
 	}
       }
     }
@@ -1615,7 +1619,7 @@ TEST (Parser, DISABLED_GetSingleEdgeAttributeByNamePath)
 	  
 	    // now verify that the value of this attribute of this edge has been
 	    // properly processed
-	    ASSERT_EQ (dotedgeattr, attr.second) << dotgraph << endl;
+	    ASSERT_EQ (dotedgeattr, removeDoubleQuotes (attr.second)) << dotgraph << endl;
 	  }
 	}
       }
@@ -1643,7 +1647,7 @@ TEST (Parser, DISABLED_GetSingleEdgeAttributeByNamePath)
 	  
 	    // now verify that the value of this attribute of this edge has been
 	    // properly processed
-	    ASSERT_EQ (dotedgeattr, attr.second) << dotgraph << endl;
+	    ASSERT_EQ (dotedgeattr, removeDoubleQuotes (attr.second)) << dotgraph << endl;
 	  }
 	}
       }
@@ -1706,7 +1710,7 @@ TEST (Parser, DISABLED_GetVerticesBlockMultipleVertices)
 	// have precisely the same information
 	if (vertexattrs.find (vertex) != vertexattrs.end () ||
 	    dotvertexattrs.find (vertex) != dotvertexattrs.end ())
-	  ASSERT_EQ (vertexattrs[vertex], dotvertexattrs[vertex]) << dotgraph << endl;
+	  ASSERT_EQ (removeDoubleQuotes (vertexattrs[vertex]), dotvertexattrs[vertex]) << dotgraph << endl;
       }
 
       // -- directed graphs
@@ -1738,7 +1742,7 @@ TEST (Parser, DISABLED_GetVerticesBlockMultipleVertices)
 	// have precisely the same information
 	if (vertexattrs.find (vertex) != vertexattrs.end () ||
 	    dotvertexattrs.find (vertex) != dotvertexattrs.end ())
-	  ASSERT_EQ (vertexattrs[vertex], dotvertexattrs[vertex]) << dotgraph << endl;
+	  ASSERT_EQ (removeDoubleQuotes (vertexattrs[vertex]), dotvertexattrs[vertex]) << dotgraph << endl;
       }
     }
   }
@@ -1800,7 +1804,7 @@ TEST (Parser, DISABLED_GetVerticesBlockMultipleVerticesPath)
 	// have precisely the same information
 	if (vertexattrs.find (vertex) != vertexattrs.end () ||
 	    dotvertexattrs.find (vertex) != dotvertexattrs.end ())
-	  ASSERT_EQ (vertexattrs[vertex], dotvertexattrs[vertex]) << dotgraph << endl;
+	  ASSERT_EQ (removeDoubleQuotes (vertexattrs[vertex]), dotvertexattrs[vertex]) << dotgraph << endl;
       }
 
       // -- directed graphs
@@ -1832,7 +1836,7 @@ TEST (Parser, DISABLED_GetVerticesBlockMultipleVerticesPath)
 	// have precisely the same information
 	if (vertexattrs.find (vertex) != vertexattrs.end () ||
 	    dotvertexattrs.find (vertex) != dotvertexattrs.end ())
-	  ASSERT_EQ (vertexattrs[vertex], dotvertexattrs[vertex]) << dotgraph << endl;
+	  ASSERT_EQ (removeDoubleQuotes (vertexattrs[vertex]), dotvertexattrs[vertex]) << dotgraph << endl;
       }
     }
   }
@@ -1893,7 +1897,7 @@ TEST (Parser, DISABLED_GetEdgesBlockMultipleVertices)
 	// have precisely the same information
 	if (edgeattrs.find (edge.first) != edgeattrs.end () ||
 	    dotedgeattrs.find (edge.first) != dotedgeattrs.end ())
-	  ASSERT_EQ (edgeattrs[edge.first], dotedgeattrs[edge.first]) << dotgraph << endl;
+	  ASSERT_EQ (removeDoubleQuotes (edgeattrs[edge.first]), dotedgeattrs[edge.first]) << dotgraph << endl;
       }
 
       // -- directed graphs
@@ -1925,7 +1929,7 @@ TEST (Parser, DISABLED_GetEdgesBlockMultipleVertices)
 	// have precisely the same information
 	if (edgeattrs.find (edge.first) != edgeattrs.end () ||
 	    dotedgeattrs.find (edge.first) != dotedgeattrs.end ())
-	  ASSERT_EQ (edgeattrs[edge.first], dotedgeattrs[edge.first]) << dotgraph << endl;
+	  ASSERT_EQ (removeDoubleQuotes (edgeattrs[edge.first]), dotedgeattrs[edge.first]) << dotgraph << endl;
       }
     }
   }
@@ -1987,7 +1991,7 @@ TEST (Parser, DISABLED_GetEdgesBlockMultipleVerticesPath)
 	// have precisely the same information
 	if (edgeattrs.find (edge.first) != edgeattrs.end () ||
 	    dotedgeattrs.find (edge.first) != dotedgeattrs.end ())
-	  ASSERT_EQ (edgeattrs[edge.first], dotedgeattrs[edge.first]) << dotgraph << endl;
+	  ASSERT_EQ (removeDoubleQuotes (edgeattrs[edge.first]), dotedgeattrs[edge.first]) << dotgraph << endl;
       }
 
       // -- directed graphs
@@ -2019,7 +2023,7 @@ TEST (Parser, DISABLED_GetEdgesBlockMultipleVerticesPath)
 	// have precisely the same information
 	if (edgeattrs.find (edge.first) != edgeattrs.end () ||
 	    dotedgeattrs.find (edge.first) != dotedgeattrs.end ())
-	  ASSERT_EQ (edgeattrs[edge.first], dotedgeattrs[edge.first]) << dotgraph << endl;
+	  ASSERT_EQ (removeDoubleQuotes (edgeattrs[edge.first]), dotedgeattrs[edge.first]) << dotgraph << endl;
       }
     }
   }
@@ -2081,7 +2085,7 @@ TEST (Parser, DISABLED_GetVerticesFullGraph)
 	// have precisely the same information
 	if (vertexattrs.find (vertex) != vertexattrs.end () ||
 	    dotvertexattrs.find (vertex) != dotvertexattrs.end ())
-	  ASSERT_EQ (vertexattrs[vertex], dotvertexattrs[vertex]) << dotgraph << endl;
+	  ASSERT_EQ (removeDoubleQuotes (vertexattrs[vertex]), dotvertexattrs[vertex]) << dotgraph << endl;
       }
 
       // -- directed graphs
@@ -2113,7 +2117,7 @@ TEST (Parser, DISABLED_GetVerticesFullGraph)
 	// have precisely the same information
 	if (vertexattrs.find (vertex) != vertexattrs.end () ||
 	    dotvertexattrs.find (vertex) != dotvertexattrs.end ())
-	  ASSERT_EQ (vertexattrs[vertex], dotvertexattrs[vertex]) << dotgraph << endl;
+	  ASSERT_EQ (removeDoubleQuotes (vertexattrs[vertex]), dotvertexattrs[vertex]) << dotgraph << endl;
       }
     }
   }
@@ -2175,7 +2179,7 @@ TEST (Parser, DISABLED_GetEdgesFullGraph)
 	// have precisely the same information
 	if (edgeattrs.find (edge.first) != edgeattrs.end () ||
 	    dotedgeattrs.find (edge.first) != dotedgeattrs.end ())
-	  ASSERT_EQ (edgeattrs[edge.first], dotedgeattrs[edge.first]) << dotgraph << endl;
+	  ASSERT_EQ (removeDoubleQuotes (edgeattrs[edge.first]), dotedgeattrs[edge.first]) << dotgraph << endl;
       }
 
       // -- directed graphs
@@ -2208,7 +2212,7 @@ TEST (Parser, DISABLED_GetEdgesFullGraph)
 	// have precisely the same information
 	if (edgeattrs.find (edge.first) != edgeattrs.end () ||
 	    dotedgeattrs.find (edge.first) != dotedgeattrs.end ())
-	  ASSERT_EQ (edgeattrs[edge.first], dotedgeattrs[edge.first]) << dotgraph << endl;
+	  ASSERT_EQ (removeDoubleQuotes (edgeattrs[edge.first]), dotedgeattrs[edge.first]) << dotgraph << endl;
       }
     }
   }
