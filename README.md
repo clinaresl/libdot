@@ -39,13 +39,13 @@ be qualified with attributes as much as vertices with an
 with statements such as `a -> [ color = red ] b;`, this library
 actually parses them correctly.
   
-As it can be seen in the BNF specification, the language parsed by
-this library allows the definition of paths, as in `a -> b -> c;` or
-blocks with multiple vertices, such as in `a -> { b c d };`. As in
-the official DOT language, a block with multiple vertices ends an edge
-statement, so that expressions such as `{ a b c } -- { d e f };`
-actually raise a syntax error. Of course, both forms can be mixed in a
-single statement such as in `a -> b -- c -- { d e f };`.
+The language parsed by this library allows the definition of paths, as
+in `a -> b -> c;` or blocks with multiple vertices, such as in `a -> {
+b c d };`. As in the official DOT language, a block with multiple
+vertices ends an edge statement, so that expressions such as `{ a b c
+} -- { d e f };` actually raise a syntax error. Of course, both forms
+can be mixed in a single statement such as in `a -> b -- c -- { d e f
+};`.
 
 Another relevant difference is the definition of IDs. For the purpose
 of this library, IDs are defined as a collection of alphanumeric
@@ -70,7 +70,9 @@ are defined as:
 
 To compile the libdot library you can use the following command:
 
+```bash
     $ ./configure; make
+```
 
 The first command, `./configure`, will go through a number of tests
 and, if it does not find any error, it will create the `Makefile` that
@@ -78,7 +80,7 @@ is executed with the second command.
 
 To install the library just type:
 
-    $ make install
+    $ sudo make install
 
 By default, the library is installed in `/usr/local/lib` and the
 header files are installed in `/usr/local/include/libdot-MAJOR.MINOR`
