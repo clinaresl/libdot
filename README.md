@@ -3,35 +3,67 @@ Simple dot parser implemented using regular expressions -- July, 2016
 
 # Introduction #
 
-This library implements a dot language parser using regular
+This library implements a DOT language parser using regular
 expressions.
 
 The formal specification of the language can be found at
 http://www.graphviz.org/doc/info/lang.html but this library only
-implements a subset of these rules.
+implements a subset of these rules. See the documentation for further
+details.
 
 Remarkably:
 
-1. It does not recognize HTML strings.
-2. Escape quotes (\") cannot be used to name IDs.
-3. C comments (`/* ... */`) are not handled yet. Instead, only C++
-comments (`//`) are acknowledged.
-4. The kewyord `strict` is not recognized yet
-5. Likewise, it is not possible to define subgraphs with the keyword
-`subgraph`.
-6. According to the official definitions of dot: *Edges can be
-specified as `->` in directed graphs and `--` in undirected
-graphs*. However, this parser acknowledges its usage in both cases
-with the obvious meaning ---i.e., `->` creates a directed edge whereas
-`--` creates an undirected edge. This actually makes that the graph
-type is not relevant at all.
+There are a number of good diferences with the official DOT language
+which are:
 
-Note that both edges and nodes can be given an `attr_list` which
-consists of a comma separated list of assignments given between square
-brackets.
+* The keyword `strict` is not recognized. Moreover, the parser does
+  not check whether the graph is truly directed or undirected, e.g.,
+  it is possible to declare a `digraph` and then to use the
+  `edge_op` `--`
 
-It also includes the code to create an executable (called `parser`)
-which effectively parses the contents of any dot file.
+* *Label statements* consist of a single assignment to an ID, i.e.,
+  they can not be continued with other expressions as in the official
+  DOT language.
+
+* There are not *subgraphs*. The DOT language implemented in this
+  library only allows to define edges between vertices as in the usual
+  mathematical formulation of a graph.
+
+* There are not *ports* and, indeed, the subset implemented here is
+  not selected for any specific purpose, but for the intention of
+  defining graphs in a general sense.
+
+On the other hand, the language parsed by this library allows edges to
+be qualified with attributes as much as vertices with an
+`attr_list`, so that whereas the official DOT language complains
+with statements such as `a -> [ color = red ] b;`, this library
+actually parses them correctly.
+  
+As it can be seen in the BNF specification, the language parsed by
+this library allows the definition of paths, as in `a -> b -> c;` or
+blocks with multiple vertices, such as in `a -> { b c d };`. As in
+the official DOT language, a block with multiple vertices ends an edge
+statement, so that expressions such as `{ a b c } -- { d e f };`
+actually raise a syntax error. Of course, both forms can be mixed in a
+single statement such as in `a -> b -- c -- { d e f };`.
+
+Another relevant difference is the definition of IDs. For the purpose
+of this library, IDs are defined as a collection of alphanumeric
+characters and the underscore `_`, so that `81_` is a
+valid ID. IDs are used for naming graphs (which is entirely optional)
+or for declaring attributes. Attributes give a VALUE to an ID which
+are defined as:
+
+* Either an integer number with or without sign, e.g., `12`, `+12`
+  or `-12`; or
+
+* A floating-point number which can be in scientific notation or
+  not. Examples are: `12.13`, `.019e-12` and `1003.`; or
+
+* A string which can be either an alphanumeric sequence which does not
+  start with a number, such as `red`, or a double quoted string
+  which can then contain any characters, such as `"I'm a double
+  quoted string"`.
 
 
 # Install #
