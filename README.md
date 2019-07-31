@@ -33,6 +33,13 @@ Another relevant difference is the definition of IDs. For the purpose of this li
 * A string which can be either an alphanumeric sequence which does not start with a number, such as `red`, or a double quoted string which can then contain any characters, such as `"I'm a double quoted string"`.
 
 
+# Dependencies #
+
+`Libdot` uses [Google Test](https://github.com/google/googletest) for defining *Test cases* and running *Unit tests*. Thus, it should be installed in the target system.
+
+In addition, `Libdot` uses [Sphinx](www.sphinx-doc.org) for automatically generating the documentation in PDF and HTML formats. If it is required to generate the documentation in PDF then `pdflatex` should be also available in the target system.
+
+
 # Install #
 
 To compile the libdot library you can use the following command:
@@ -45,7 +52,9 @@ The first command, `./configure`, will go through a number of tests and, if it d
 
 To install the library just type:
 
-    $ sudo make install
+```bash
+   $ make install
+```    
 
 By default, the library is installed in `/usr/local/lib` and the header files are installed in `/usr/local/include/libdot-MAJOR.MINOR` (where *MAJOR* and *MINOR* are substituted by the version numbers of this library) To change the include and lib dirs use `--prefix` with `./configure`:
 
@@ -63,19 +72,36 @@ To uninstall the binaries and headers of the libdot library just execute:
 
 Be aware that it might be necessary to prepend both `make install` and `make uninstall` with `sudo` in case you are installing in su-protected directories such as `/usr/local`
 
-To compile the `parser`, go to the directory `parser/` and use the following command:
+
+# Tests #
+
+The unit tests have been defined using Google Test. To compile all test cases and run the tests, type:
 
 ```bash
-    $ ./configure; make
+   $ make check
 ```    
 
-The same instructions given above for customizing the configuration of
-the library can be used here to customize the creation of the
-makefile. To remove ancillary files use the command:
+from the root directory where the library has been installed. In case all tests are enabled, a failure might be reported for all those unit tests that require accessing files below the directory `tests`. To make sure the tests are performed correctly it is strongly adviced to execute the following commands:
 
 ```bash
-    $ make distclean
+   $ cd tests
+   $ ./gtest --gtest_also_run_disabled_tests
 ```    
+
+# Documentation #
+
+All the documentation has been generated with Sphinx. To regenerate the documentation type:
+
+```bash
+   $ make html
+```    
+
+from the `doc/` directory to generate the documentation in HTML format. The main HTML page can be found at `_build/html/index.html`; and type:
+
+```bash
+   $ make latexpdf
+```    
+from the `doc/` directory to generate the same documentation as a PDF. Note that this requires `pdflatex` to be installed in your system.
 
 
 # Examples #
@@ -177,21 +203,17 @@ Finally, `parser` acknowledges two additional directives:
 
 # License #
 
-libdot is free software: you can redistribute it and/or modify it
-under the terms of the GNU General Public License as published by the
-Free Software Foundation, either version 3 of the License, or (at your
-option) any later version.
+libdot is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 
-libdot is distributed in the hope that it will be useful, but
-WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-General Public License for more details.
+libdot is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License
-along with libdot.  If not, see <http://www.gnu.org/licenses/>.
+You should have received a copy of the GNU General Public License along with libdot.  If not, see <http://www.gnu.org/licenses/>.
 
 
 # Author #
 
 Carlos Linares Lopez <carlos.linares@uc3m.es>
+Computer Science Department
+Universidad Carlos III de Madrid, Spain
+
 
