@@ -42,7 +42,7 @@ In addition, `Libdot` uses [Sphinx](www.sphinx-doc.org) for automatically genera
 
 # Install #
 
-To compile the libdot library you can use the following command:
+To compile the `Libdot` library you can use the following command:
 
 ```bash
    $ ./configure; make
@@ -64,13 +64,19 @@ By default, the library is installed in `/usr/local/lib` and the header files ar
 
 It will automatically create a `Makefile` which is specifically instructed to copy all the binaries and headers in `/home/myuser/local`
 
-To uninstall the binaries and headers of the libdot library just execute:
+To uninstall the binaries and headers of the `Libdot` library just execute:
 
 ```bash
    $ make uninstall
 ```    
 
-Be aware that it might be necessary to prepend both `make install` and `make uninstall` with `sudo` in case you are installing in su-protected directories such as `/usr/local`
+Be aware that it might be necessary to prepend both `make install` and `make uninstall` with `sudo` in case you are installing in su-protected directories such as `/usr/local`.
+
+Finally, to entirely remove the intermediate files from the installation directory type:
+
+```bash
+   $ make distclean
+```   
 
 
 # Tests #
@@ -203,17 +209,15 @@ Finally, `parser` acknowledges two additional directives:
 
 # License #
 
-libdot is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+`Libdot` is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 
-libdot is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+`Libdot` is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License along with libdot.  If not, see <http://www.gnu.org/licenses/>.
+You should have received a copy of the GNU General Public License along with `Libdot`.  If not, see <http://www.gnu.org/licenses/>.
 
 
 # Author #
 
 Carlos Linares Lopez <carlos.linares@uc3m.es>
-Computer Science Department
-Universidad Carlos III de Madrid, Spain
 
 
