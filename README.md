@@ -3,67 +3,34 @@ Simple dot parser implemented using regular expressions -- July, 2016
 
 # Introduction #
 
-This library implements a DOT language parser using regular
-expressions.
+This library implements a DOT language parser using regular expressions.
 
-The formal specification of the language can be found at
-http://www.graphviz.org/doc/info/lang.html but this library only
-implements a subset of these rules. See the documentation for further
+The formal specification of the language can be found at http://www.graphviz.org/doc/info/lang.html but this library only implements a subset of these rules. See the documentation for further
 details.
 
 Remarkably:
 
-There are a number of good diferences with the official DOT language
-which are:
+There are a number of good diferences with the official DOT language which are:
 
-* The keyword `strict` is not recognized. Moreover, the parser does
-  not check whether the graph is truly directed or undirected, e.g.,
-  it is possible to declare a `digraph` and then to use the
-  `edge_op` `--`
+* The keyword `strict` is not recognized. Moreover, the parser does not check whether the graph is truly directed or undirected, e.g., it is possible to declare a `digraph` and then to use the `edge_op` `--`
 
-* *Label statements* consist of a single assignment to an ID, i.e.,
-  they can not be continued with other expressions as in the official
-  DOT language.
+* *Label statements* consist of a single assignment to an ID, i.e., they can not be continued with other expressions as in the official DOT language.
 
-* There are not *subgraphs*. The DOT language implemented in this
-  library only allows to define edges between vertices as in the usual
-  mathematical formulation of a graph.
+* There are not *subgraphs*. The DOT language implemented in this library only allows to define edges between vertices as in the usual mathematical formulation of a graph.
 
-* There are not *ports* and, indeed, the subset implemented here is
-  not selected for any specific purpose, but for the intention of
-  defining graphs in a general sense.
+* There are not *ports* and, indeed, the subset implemented here is not selected for any specific purpose, but for the intention of defining graphs in a general sense.
 
-On the other hand, the language parsed by this library allows edges to
-be qualified with attributes as much as vertices with an
-`attr_list`, so that whereas the official DOT language complains
-with statements such as `a -> [ color = red ] b;`, this library
-actually parses them correctly.
+On the other hand, the language parsed by this library allows edges to be qualified with attributes as much as vertices with an `attr_list`, so that whereas the official DOT language complains with statements such as `a -> [ color = red ] b;`, this library actually parses them correctly.
   
-The language parsed by this library allows the definition of paths, as
-in `a -> b -> c;` or blocks with multiple vertices, such as in `a -> {
-b c d };`. As in the official DOT language, a block with multiple
-vertices ends an edge statement, so that expressions such as `{ a b c
-} -- { d e f };` actually raise a syntax error. Of course, both forms
-can be mixed in a single statement such as in `a -> b -- c -- { d e f
-};`.
+The language parsed by this library allows the definition of paths, as in `a -> b -> c;` or blocks with multiple vertices, such as in `a -> { b c d };`. As in the official DOT language, a block with multiple vertices ends an edge statement, so that expressions such as `{ a b c } -- { d e f };` actually raise a syntax error. Of course, both forms can be mixed in a single statement such as in `a -> b -- c -- { d e f};`.
 
-Another relevant difference is the definition of IDs. For the purpose
-of this library, IDs are defined as a collection of alphanumeric
-characters and the underscore `_`, so that `81_` is a
-valid ID. IDs are used for naming graphs (which is entirely optional)
-or for declaring attributes. Attributes give a VALUE to an ID which
-are defined as:
+Another relevant difference is the definition of IDs. For the purpose of this library, IDs are defined as a collection of alphanumeric characters and the underscore `_`, so that `81_` is a valid ID. IDs are used for naming graphs (which is entirely optional) or for declaring attributes. Attributes give a VALUE to an ID which are defined as:
 
-* Either an integer number with or without sign, e.g., `12`, `+12`
-  or `-12`; or
+* Either an integer number with or without sign, e.g., `12`, `+12` or `-12`; or
 
-* A floating-point number which can be in scientific notation or
-  not. Examples are: `12.13`, `.019e-12` and `1003.`; or
+* A floating-point number which can be in scientific notation or not. Examples are: `12.13`, `.019e-12` and `1003.`; or
 
-* A string which can be either an alphanumeric sequence which does not
-  start with a number, such as `red`, or a double quoted string
-  which can then contain any characters, such as `"I'm a double
-  quoted string"`.
+* A string which can be either an alphanumeric sequence which does not start with a number, such as `red`, or a double quoted string which can then contain any characters, such as `"I'm a double quoted string"`.
 
 
 # Install #
@@ -74,21 +41,17 @@ To compile the libdot library you can use the following command:
     $ ./configure; make
 ```
 
-The first command, `./configure`, will go through a number of tests
-and, if it does not find any error, it will create the `Makefile` that
-is executed with the second command.
+The first command, `./configure`, will go through a number of tests and, if it does not find any error, it will create the `Makefile` that is executed with the second command.
 
 To install the library just type:
 
     $ sudo make install
 
-By default, the library is installed in `/usr/local/lib` and the
-header files are installed in `/usr/local/include/libdot-MAJOR.MINOR`
-(where *MAJOR* and *MINOR* are substituted by the version numbers of
-this library) To change the include and lib dirs use `--prefix` with
-`./configure`:
+By default, the library is installed in `/usr/local/lib` and the header files are installed in `/usr/local/include/libdot-MAJOR.MINOR` (where *MAJOR* and *MINOR* are substituted by the version numbers of this library) To change the include and lib dirs use `--prefix` with `./configure`:
 
+    ```bash
     $ ./configure --prefix=/home/myuser/local; make
+    ```
 
 It will automatically create a `Makefile` which is specifically
 instructed to copy all the binaries and headers in
