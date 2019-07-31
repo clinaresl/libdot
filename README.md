@@ -1,6 +1,3 @@
-Simple dot parser implemented using regular expressions -- July, 2016
-
-
 # Introduction #
 
 This library implements a DOT language parser using regular expressions.
