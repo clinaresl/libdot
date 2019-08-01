@@ -108,6 +108,12 @@ from the `doc/` directory to generate the documentation in HTML format. The main
 ```    
 from the `doc/` directory to generate the same documentation as a PDF. Note that this requires `pdflatex` to be installed in your system.
 
+Finally, to entirely remove the intermediate files from the `doc/` directory type:
+
+```bash
+   $ make clean
+```   
+
 
 # License #
 
